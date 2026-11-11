@@ -1,11 +1,511 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Mauxy Salcedo</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ============ META ============ -->
+<title>María Auxiliadora Salcedo Pérez · Business & Data Analyst</title>
+<meta name="description" content="Business & Data Analyst junior en Barranquilla. Proyectos de forecasting y análisis económico con Python. Disponible para prácticas desde enero de 2027.">
+<meta name="author" content="María Auxiliadora Salcedo Pérez">
+<link rel="canonical" href="https://mauxysalcedo.github.io/">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mauxysalcedo.github.io/">
+<meta property="og:title" content="María Auxiliadora Salcedo Pérez · Business & Data Analyst">
+<meta property="og:description" content="Forecasting, análisis económico y negocio con Python, Excel y Power BI. Disponible para prácticas desde enero de 2027.">
+<meta property="og:image" content="https://mauxysalcedo.github.io/og.png">
+<meta property="og:locale" content="es_CO">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Favicon: monograma MS -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%231E3A5F'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='28' fill='%23F7F5F0' text-anchor='middle'%3EMS%3C/text%3E%3C/svg%3E">
+
+<!-- ============ FUENTES ============ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#F7F5F0;
+  --ink:#1A1A1A;
+  --muted:#5C5C5C;
+  --rule:#D6D2C8;
+  --accent:#1E3A5F;
+  --accent-dark:#142940;
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --gutter:20px;
+}
+@media (min-width:760px){:root{--gutter:40px}}
+
+/* ============ BASE ============ */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:1rem;line-height:1.6;text-rendering:optimizeLegibility}
+h1,h2,h3{font-family:var(--serif);font-weight:500;margin:0;letter-spacing:-.015em}
+p{margin:0 0 1em;max-width:65ch}
+a{color:var(--accent);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.label{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.wrap{max-width:1160px;margin:0 auto;padding:0 var(--gutter)}
+
+/* Marcador de contenido por completar (quitar cuando no quede ninguno) */
+.pending{font-family:var(--mono);font-size:.85em;color:var(--accent);background:rgba(30,58,95,.08);outline:1px dashed var(--accent);padding:0 .3em}
+
+.skip{position:absolute;left:-999px;top:8px;background:var(--accent);color:#fff;padding:8px 12px;z-index:10}
+.skip:focus{left:8px}
+
+/* Grid editorial: columna estrecha (número/fecha) + columna de contenido */
+.grid{display:grid;grid-template-columns:1fr;gap:8px 24px}
+@media (min-width:860px){
+  .grid{grid-template-columns:repeat(12,minmax(0,1fr))}
+  .aside{grid-column:1 / 4}
+  .body{grid-column:4 / 13}
+}
+
+/* ============ BARRA SUPERIOR ============ */
+.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--rule)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+.brand{font-family:var(--serif);font-size:1.05rem;color:var(--ink);text-decoration:none}
+.nav{display:none;gap:28px}
+.nav a{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.nav a:hover{color:var(--accent)}
+@media (min-width:760px){.nav{display:flex}}
+.right{display:flex;align-items:center;gap:32px}
+.lang{display:flex;font-family:var(--mono);font-size:.75rem}
+.lang button{font:inherit;background:none;border:1px solid var(--rule);color:var(--muted);padding:4px 8px;cursor:pointer}
+.lang button+button{border-left:0}
+.lang button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+
+/* ============ 1. ENCABEZADO ============ */
+.hero{padding:64px 0 56px}
+@media (min-width:860px){.hero{padding:112px 0 80px}}
+.hero .eyebrow{font-family:var(--mono);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
+.hero h1{font-size:clamp(2.5rem,7.2vw,5.6rem);line-height:1.02;font-variation-settings:"opsz" 144;max-width:14ch}
+.hero .lead{font-size:clamp(1.05rem,1.6vw,1.25rem);line-height:1.55;margin:28px 0 20px;max-width:56ch}
+.hero .avail{font-family:var(--mono);font-size:.85rem;color:var(--ink);margin-bottom:32px}
+.hero .avail strong{font-weight:500;color:var(--accent)}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;font-family:var(--sans);font-weight:500;font-size:.95rem;padding:13px 22px;border:1px solid var(--accent);text-decoration:none;transition:background-color .15s,color .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-dark);border-color:var(--accent-dark)}
+.btn-secondary{color:var(--accent)}
+.btn-secondary:hover{background:var(--accent);color:#fff}
+
+/* ============ 2. CIFRAS CLAVE ============ */
+.figures{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 20px;padding:0 0 72px;margin:0}
+@media (min-width:860px){.figures{grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}}
+.figure{border-top:2px solid var(--ink);padding-top:14px}
+.figure p{margin:0}
+.figure .num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500;font-size:clamp(2rem,4.6vw,3.4rem);line-height:1;color:var(--accent);letter-spacing:-.02em}
+.figure .num small{font-size:.45em;color:var(--muted);font-weight:400;letter-spacing:0}
+.figure{display:flex;flex-direction:column;gap:8px}
+.figure .what{font-size:.95rem;line-height:1.35}
+.figure .src{font-family:var(--mono);font-size:.7rem;color:var(--muted);letter-spacing:.04em}
+
+/* ============ SECCIONES ============ */
+.section{border-top:1px solid var(--ink);padding:40px 0 64px}
+@media (min-width:860px){.section{padding:48px 0 96px}}
+.sec-head{margin-bottom:32px}
+.sec-num{font-family:var(--mono);font-size:.85rem;color:var(--accent)}
+.sec-head h2{font-size:clamp(1.9rem,4vw,2.8rem);line-height:1.1}
+
+/* ============ 3. PROYECTOS ============ */
+.case{border-top:1px solid var(--rule);padding:32px 0 40px}
+.case .aside .mono{font-size:.85rem;color:var(--muted)}
+.case .aside .idx{display:block;color:var(--accent);font-size:.85rem;font-family:var(--mono);margin-bottom:4px}
+.case h3{font-size:clamp(1.4rem,2.6vw,1.9rem);line-height:1.2;margin-bottom:24px;max-width:30ch}
+.facts{margin:0;display:grid;grid-template-columns:1fr;gap:4px 24px}
+@media (min-width:620px){.facts{grid-template-columns:120px minmax(0,1fr)} .facts dd{grid-column:2}}
+.facts dt{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:4px}
+.facts dd{margin:0 0 14px;max-width:65ch}
+.facts dd.result{font-family:var(--mono);font-size:.95rem;color:var(--ink);border-left:2px solid var(--accent);padding-left:12px}
+.facts dd.tools{font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+
+/* Gráfico del salario */
+.chart{margin:8px 0 24px;max-width:520px}
+.chart svg{width:100%;height:auto;display:block}
+.chart .t{font-family:var(--sans);font-size:12.5px;fill:var(--ink)}
+.chart .v{font-family:var(--mono);font-size:13px;font-weight:500}
+.chart figcaption{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:6px}
+
+/* ============ 4. EXPERIENCIA ============ */
+.job{border-top:1px solid var(--rule);padding:24px 0 28px}
+.job .aside{font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+.job h3{font-size:1.3rem;line-height:1.25}
+.job .org{font-size:.95rem;color:var(--muted);margin:4px 0 12px}
+
+/* ============ 5. FORMACIÓN ============ */
+.edu{margin:0;display:grid;grid-template-columns:1fr;gap:0 40px}
+@media (min-width:860px){.edu{grid-template-columns:1fr 1fr}}
+.edu > div{border-top:1px solid var(--rule);padding:18px 0 22px}
+.edu dt{margin-bottom:8px}
+.edu dd{margin:0}
+.edu ul{list-style:none;padding:0;margin:0}
+.edu li{padding:5px 0;border-bottom:1px dotted var(--rule)}
+.edu li:last-child{border-bottom:0}
+.edu .sub{color:var(--muted);font-size:.9rem}
+
+/* ============ 6. CONTACTO Y PIE ============ */
+.mail{display:inline-block;font-family:var(--serif);font-size:clamp(1.5rem,5.4vw,3.2rem);line-height:1.15;overflow-wrap:anywhere;margin:4px 0 24px}
+.links{font-family:var(--mono);font-size:.9rem;display:flex;flex-wrap:wrap;gap:8px 28px}
+.foot{border-top:1px solid var(--rule);padding:24px 0 40px;font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+
+/* ============ APARICIÓN SUTIL ============ */
+.js .reveal{opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s ease}
+.js .reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js .reveal{opacity:1;transform:none;transition:none}
+}
+
+/* ============ IMPRESIÓN (CV) ============ */
+@media print{
+  @page{margin:16mm}
+  body{background:#fff;color:#000;font-size:10.5pt}
+  .top,.actions,.skip,.lang{display:none!important}
+  .hero{padding:0 0 16px}
+  .hero h1{font-size:28pt;max-width:none}
+  .figure .num,.sec-num,a,.case .aside .idx{color:#000}
+  .section{padding:14px 0 18px;break-inside:auto}
+  .case,.job{break-inside:avoid;padding:12px 0}
+  .grid{grid-template-columns:repeat(12,1fr)}
+  .aside{grid-column:1 / 3}.body{grid-column:3 / 13}
+  .figures{grid-template-columns:repeat(4,1fr);padding-bottom:16px}
+  .facts dd.result{border-color:#000}
+  .chart{display:none}
+  .js .reveal{opacity:1;transform:none}
+  a{text-decoration:none}
+}
+</style>
+<script>document.documentElement.classList.add('js')</script>
 </head>
+
 <body>
-  <h1>¡Hola! Este es mi sitio</h1>
-  <p>Portafolio en construcción.</p>
+<a class="skip" href="#main" data-i18n="skip">Saltar al contenido</a>
+
+<!-- ============ BARRA SUPERIOR ============ -->
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#main">M. A. Salcedo</a>
+    <div class="right">
+      <nav class="nav" aria-label="Secciones">
+        <a href="#proyectos" data-i18n="nav1">Proyectos</a>
+        <a href="#experiencia" data-i18n="nav2">Experiencia</a>
+        <a href="#formacion" data-i18n="nav3">Formación</a>
+        <a href="#contacto" data-i18n="nav4">Contacto</a>
+      </nav>
+      <div class="lang" role="group" aria-label="Idioma / Language">
+        <button type="button" data-lang="es" aria-pressed="true">ES</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div class="wrap">
+
+  <!-- ============ 1. ENCABEZADO ============ -->
+  <section class="hero grid" aria-labelledby="name">
+    <div class="body" style="grid-column:1 / -1">
+      <p class="eyebrow" data-i18n="role">Business &amp; Data Analyst junior</p>
+      <h1 id="name">María Auxiliadora Salcedo Pérez</h1>
+      <p class="lead" data-i18n="lead">Estudio Administración de Empresas y Transformación Digital en la Universidad Sergio Arboleda (8.º semestre). Fundé un negocio de accesorios tecnológicos en 2023 y analizo datos con Python, Excel y Power BI.</p>
+      <p class="avail" data-i18n="avail"><strong>Disponible para prácticas desde enero de 2027</strong> · Barranquilla, Colombia</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#proyectos" data-i18n="cta1">Ver proyectos</a>
+        <a class="btn btn-secondary" href="cv.pdf" download data-i18n="cta2">Descargar CV</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. CIFRAS CLAVE ============ -->
+  <div class="figures reveal">
+    <div class="figure">
+      <p class="num">750+</p>
+      <p><span class="what" data-i18n="f1">unidades vendidas</span><br><span class="src">Inizitech · 2023–2026</span></p>
+    </div>
+    <div class="figure">
+      <p class="num">150+</p>
+      <p><span class="what" data-i18n="f2">clientes</span><br><span class="src">Inizitech · 2023–2026</span></p>
+    </div>
+    <div class="figure">
+      <p class="num">55K</p>
+      <p><span class="what" data-i18n="f3">de alcance en una campaña</span><br><span class="src">Inizitech</span></p>
+    </div>
+    <div class="figure">
+      <p class="num">4.43<small>/5.0</small></p>
+      <p><span class="what" data-i18n="f4">promedio académico</span><br><span class="src">U. Sergio Arboleda</span></p>
+    </div>
+  </div>
+
+  <!-- ============ 3. PROYECTOS ============ -->
+  <section class="section" id="proyectos" aria-labelledby="h-proj">
+    <div class="grid sec-head">
+      <div class="aside"><span class="sec-num">01</span></div>
+      <div class="body"><h2 id="h-proj" data-i18n="nav1">Proyectos</h2></div>
+    </div>
+
+    <!-- Proyecto 1: salario mínimo -->
+    <article class="case grid reveal">
+      <div class="aside"><span class="idx">01.1</span><span class="mono">2016–2025</span></div>
+      <div class="body">
+        <h3 data-i18n="p1t">Poder adquisitivo del salario mínimo en Colombia</h3>
+        <dl class="facts">
+          <dt data-i18n="kProb">Problema</dt>
+          <dd data-i18n="p1p">Cada año se anuncia el aumento nominal del salario mínimo. Quise medir cuánto poder de compra gana de verdad quien lo recibe.</dd>
+          <dt data-i18n="kDid">Qué hice</dt>
+          <dd data-i18n="p1d">Construí un análisis en tres capas con datos del DANE y el Banrep: salario real deflactado, excedente sobre la línea de pobreza y comparación con el costo de la matrícula universitaria.</dd>
+          <dt data-i18n="kRes">Resultado</dt>
+          <dd>
+            <figure class="chart">
+              <svg viewBox="0 0 360 104" role="img" aria-labelledby="ch-t ch-d">
+                <title id="ch-t" data-i18n="chT">Aumento nominal frente a poder de compra real, 2016–2025</title>
+                <desc id="ch-d" data-i18n="chD">El salario mínimo subió 106% en términos nominales, pero su poder de compra real solo aumentó 26%.</desc>
+                <text class="t" x="0" y="14" data-i18n="chA">Aumento nominal</text>
+                <rect x="0" y="22" width="270" height="18" fill="#B9B4AA"/>
+                <text class="v" x="278" y="36" fill="#1A1A1A">106%</text>
+                <text class="t" x="0" y="68" data-i18n="chB">Poder de compra real</text>
+                <rect x="0" y="76" width="66" height="18" fill="#1E3A5F"/>
+                <text class="v" x="74" y="90" fill="#1E3A5F">26%</text>
+              </svg>
+              <figcaption data-i18n="chS">Fuente: DANE, Banrep. Cálculos propios.</figcaption>
+            </figure>
+          </dd>
+          <dd class="result" data-i18n="p1r">Un aumento nominal del 106% equivale a solo 26% de poder de compra real.</dd>
+          <dt data-i18n="kTools">Herramientas</dt>
+          <dd class="tools">Python · pandas · NumPy · Matplotlib · Seaborn</dd>
+        </dl>
+      </div>
+    </article>
+
+    <!-- Proyecto 2: Walmart -->
+    <article class="case grid reveal">
+      <div class="aside"><span class="idx">01.2</span><span class="mono" data-i18n="p2date">Agosto 2026</span></div>
+      <div class="body">
+        <h3>Walmart Sales Forecasting</h3>
+        <dl class="facts">
+          <dt data-i18n="kProb">Problema</dt>
+          <dd data-i18n="p2p">Anticipar las ventas de Walmart por tienda y por departamento.</dd>
+          <dt data-i18n="kDid">Qué hice</dt>
+          <dd data-i18n="p2d">Fase 1: apliqué Holt-Winters a las 5 tiendas de mayor volumen y validé los pronósticos con MAD, MSE, RMSE y MAPE. Fase 2: entrené modelos de Random Forest y Gradient Boosting por departamento.</dd>
+          <dt data-i18n="kTools">Herramientas</dt>
+          <dd class="tools">Python · pandas · Scikit-learn · Jupyter</dd>
+          <dt>Link</dt>
+          <dd><a href="https://github.com/mauxysalcedo/walmart-sales-forecasting" rel="noopener">github.com/mauxysalcedo/walmart-sales-forecasting</a></dd>
+        </dl>
+      </div>
+    </article>
+
+    <!-- Proyecto 3: FinnBot -->
+    <article class="case grid reveal">
+      <div class="aside"><span class="idx">01.3</span><span class="mono">2026</span></div>
+      <div class="body">
+        <h3 data-i18n="p3t">FinnBot · Hackatón Barranqu-IA 2026</h3>
+        <dl class="facts">
+          <dt data-i18n="kProb">Problema</dt>
+          <dd data-i18n="p3p">Diseñar un agente de IA conversacional para educación financiera en la hackatón de GDG Barranquilla.</dd>
+          <dt data-i18n="kDid">Qué hice</dt>
+          <dd data-i18n="p3d">Fui Product Strategist y QA Lead: hice la investigación de mercado, preparé el pitch y lideré el QA con 25 casos de prueba.</dd>
+          <dt data-i18n="kRole">Enfoque</dt>
+          <dd class="tools" data-i18n="p3k">Investigación de mercado · Pitch · QA</dd>
+        </dl>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ 4. EXPERIENCIA ============ -->
+  <section class="section" id="experiencia" aria-labelledby="h-exp">
+    <div class="grid sec-head">
+      <div class="aside"><span class="sec-num">02</span></div>
+      <div class="body"><h2 id="h-exp" data-i18n="nav2">Experiencia</h2></div>
+    </div>
+
+    <article class="job grid reveal">
+      <div class="aside" data-i18n="j1date">Abr 2023 – actualidad</div>
+      <div class="body">
+        <h3 data-i18n="j1r">Fundadora</h3>
+        <p class="org">Inizitech</p>
+        <p data-i18n="j1d">Negocio de accesorios tecnológicos: 750+ unidades vendidas, 150+ clientes y campañas de hasta 55K de alcance. Creé la web en Wix y automaticé la atención al cliente con ManyChat.</p>
+      </div>
+    </article>
+
+    <article class="job grid reveal">
+      <div class="aside" data-i18n="j2date">Jul 2026 – actualidad</div>
+      <div class="body">
+        <h3 data-i18n="j2r">Team Leader de Talent Acquisition</h3>
+        <p class="org" data-i18n="j2o">AIESEC en Colombia · Comité Uninorte</p>
+        <p data-i18n="j2d">Diseño y ejecuto la estrategia de outreach, con seguimiento del pipeline y la conversión en Excel. Lidero a 1 team member.</p>
+      </div>
+    </article>
+
+    <article class="job grid reveal">
+      <div class="aside" data-i18n="j3date">Jun 2026</div>
+      <div class="body">
+        <h3 data-i18n="j3r">Voluntaria</h3>
+        <p class="org" data-i18n="j3o">Gobernación del Atlántico</p>
+        <p data-i18n="j3d">Apoyo logístico en el programa Atlántico Entorno Seguro.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ 5. FORMACIÓN Y CERTIFICACIONES ============ -->
+  <section class="section" id="formacion" aria-labelledby="h-edu">
+    <div class="grid sec-head">
+      <div class="aside"><span class="sec-num">03</span></div>
+      <div class="body"><h2 id="h-edu" data-i18n="h3">Formación y certificaciones</h2></div>
+    </div>
+
+    <div class="grid">
+      <dl class="edu body reveal">
+        <div>
+          <dt class="label" data-i18n="e1k">Universidad</dt>
+          <dd>
+            <span data-i18n="e1v">Administración de Empresas y Transformación Digital</span><br>
+            <span class="sub" data-i18n="e1s">Universidad Sergio Arboleda, Barranquilla · 2023–2027 · 8.º semestre · Promedio 4.43/5.0</span>
+          </dd>
+        </div>
+        <div>
+          <dt class="label" data-i18n="e2k">Certificaciones</dt>
+          <dd>
+            <ul>
+              <li>Python for Data Science, AI &amp; Development <span class="sub">· IBM</span></li>
+              <li data-i18n="c2">Excel intermedio a avanzado <span class="sub">· Santander</span></li>
+              <li>Build with AI <span class="sub">· GDG</span></li>
+              <li>Successful Negotiation <span class="sub" data-i18n="c4">· Universidad de Michigan</span></li>
+              <li class="sub" data-i18n="c5">+9 más en LinkedIn</li>
+            </ul>
+          </dd>
+        </div>
+        <div>
+          <dt class="label" data-i18n="e3k">Herramientas</dt>
+          <dd class="mono" style="font-size:.9rem">Python (pandas, NumPy, Matplotlib, Seaborn, Scikit-learn) · Power BI · Excel · Jupyter · Trello · Wix · ManyChat · Canva</dd>
+        </div>
+        <div>
+          <dt class="label" data-i18n="e4k">Idiomas</dt>
+          <dd data-i18n="e4v">Español nativo · Inglés B1</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ============ 6. CONTACTO ============ -->
+  <section class="section" id="contacto" aria-labelledby="h-con">
+    <div class="grid sec-head">
+      <div class="aside"><span class="sec-num">04</span></div>
+      <div class="body"><h2 id="h-con" data-i18n="nav4">Contacto</h2></div>
+    </div>
+    <div class="grid">
+      <div class="body">
+        <p data-i18n="conT">Busco prácticas en análisis de datos o de negocio desde enero de 2027. Escríbeme.</p>
+        <a class="mail" href="mailto:mauxysalcedo@gmail.com">mauxysalcedo@gmail.com</a>
+        <div class="links">
+          <a href="https://github.com/mauxysalcedo" rel="noopener">github.com/mauxysalcedo</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<!-- ============ PIE DE PÁGINA ============ -->
+<footer class="foot">
+  <div class="wrap">© 2026 María Auxiliadora Salcedo Pérez</div>
+</footer>
+
+<script>
+/* ============ IDIOMA ES / EN ============ */
+/* El español se lee del propio HTML; aquí solo está el inglés. */
+const EN = {
+  skip:"Skip to content",
+  nav1:"Projects", nav2:"Experience", nav3:"Education", nav4:"Contact",
+  role:"Junior Business &amp; Data Analyst",
+  lead:"I study Business Administration and Digital Transformation at Universidad Sergio Arboleda (8th semester). I founded a tech accessories business in 2023 and I analyze data with Python, Excel and Power BI.",
+  avail:"<strong>Available for internships from January 2027</strong> · Barranquilla, Colombia",
+  cta1:"See projects", cta2:"Download CV",
+  f1:"units sold", f2:"customers", f3:"reach in a single campaign", f4:"GPA",
+  kProb:"Problem", kDid:"What I did", kRes:"Result", kTools:"Tools", kRole:"Focus",
+  p1t:"Purchasing power of Colombia's minimum wage",
+  p1p:"Every year the nominal minimum wage increase is announced. I wanted to measure how much purchasing power its earners actually gain.",
+  p1d:"I built a three-layer analysis with DANE and Banrep data: real wage deflated by inflation, surplus over the poverty line, and comparison with university tuition costs.",
+  chT:"Nominal increase vs. real purchasing power, 2016–2025",
+  chD:"The minimum wage rose 106% in nominal terms, but its real purchasing power only grew 26%.",
+  chA:"Nominal increase", chB:"Real purchasing power",
+  chS:"Source: DANE, Banrep. Own calculations.",
+  p1r:"A 106% nominal increase equals only 26% in real purchasing power.",
+  p2date:"August 2026",
+  p2p:"Forecast Walmart sales by store and by department.",
+  p2d:"Phase 1: I applied Holt-Winters to the 5 highest-volume stores and validated forecasts with MAD, MSE, RMSE and MAPE. Phase 2: I trained Random Forest and Gradient Boosting models by department.",
+  p3t:"FinnBot · Barranqu-IA Hackathon 2026",
+  p3p:"Design a conversational AI agent for financial education at the GDG Barranquilla hackathon.",
+  p3d:"I was Product Strategist and QA Lead: I ran the market research, prepared the pitch and led QA with 25 test cases.",
+  p3k:"Market research · Pitch · QA",
+  j1date:"Apr 2023 – present", j1r:"Founder",
+  j1d:"Tech accessories business: 750+ units sold, 150+ customers and campaigns reaching up to 55K people. I built the website on Wix and automated customer service with ManyChat.",
+  j2date:"Jul 2026 – present", j2r:"Team Leader, Talent Acquisition",
+  j2o:"AIESEC in Colombia · Uninorte Committee",
+  j2d:'I design and run the outreach strategy, tracking the pipeline and conversion in Excel. I lead 1 team member.',
+  j3date:"Jun 2026", j3r:"Volunteer", j3o:"Atlántico Department Government",
+  j3d:"Logistics support for the Atlántico Entorno Seguro program.",
+  h3:"Education and certifications",
+  e1k:"University", e1v:"Business Administration and Digital Transformation",
+  e1s:"Universidad Sergio Arboleda, Barranquilla · 2023–2027 · 8th semester · GPA 4.43/5.0",
+  e2k:"Certifications",
+  c2:'Intermediate to Advanced Excel <span class="sub">· Santander</span>',
+  c4:"· University of Michigan", c5:"+9 more on LinkedIn",
+  e3k:"Tools", e4k:"Languages", e4v:"Spanish (native) · English (B1)",
+  conT:"I'm looking for a data or business analysis internship starting January 2027. Write to me."
+};
+
+const nodes = document.querySelectorAll('[data-i18n]');
+const ES = {};
+nodes.forEach(n => { ES[n.dataset.i18n] = n.innerHTML; });
+const TITLES = {
+  es: document.title,
+  en: "María Auxiliadora Salcedo Pérez · Business & Data Analyst"
+};
+
+function setLang(lang){
+  const dict = lang === 'en' ? EN : ES;
+  nodes.forEach(n => {
+    const v = dict[n.dataset.i18n];
+    if (v != null) n.innerHTML = v;
+  });
+  document.documentElement.lang = lang;
+  document.title = TITLES[lang];
+  document.querySelectorAll('.lang button').forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.lang === lang));
+  });
+  try { localStorage.setItem('lang', lang); } catch (e) {}
+}
+
+document.querySelectorAll('.lang button').forEach(b => {
+  b.addEventListener('click', () => setLang(b.dataset.lang));
+});
+try { if (localStorage.getItem('lang') === 'en') setLang('en'); } catch (e) {}
+
+/* ============ APARICIÓN SUTIL AL HACER SCROLL ============ */
+const items = document.querySelectorAll('.reveal');
+if ('IntersectionObserver' in window) {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  items.forEach(el => io.observe(el));
+} else {
+  items.forEach(el => el.classList.add('in'));
+}
+</script>
 </body>
 </html>
