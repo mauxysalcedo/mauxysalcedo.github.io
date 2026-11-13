@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inizitech · Haz tu pedido</title>
+<style>
+  /* =========================================================
+     COLORES DE MARCA
+     Tomados del imagotipo de Inizi Tech (azul marino + gris claro).
+     Cambiando estas variables se adapta toda la página.
+     ========================================================= */
+  :root {
+    --marca: #2e466b;          /* Azul marino del logo Inizi Tech */
+    --marca-oscuro: #1b2b45;   /* Textos fuertes */
+    --marca-suave: #eef1f6;    /* Fondo de las opciones */
+    --marca-borde: #cfd8e6;    /* Bordes suaves */
+    --logo-claro: #e5e5e5;     /* Gris claro del logo */
+    --destacado: #f59e0b;      /* Etiqueta "Más pedido" */
+    --destacado-suave: #fff7e0;
+    --whatsapp: #25d366;  /* Verde oficial para que el cliente reconozca WhatsApp */
+    --whatsapp-hover: #1eb956;
+    --blanco: #ffffff;
+    --gris: #64748b;
+    --radio: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    background: var(--marca);
+    color: var(--marca-oscuro);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px; line-height: 1.4;
+    padding: 32px 16px 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  input, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--destacado); outline-offset: 2px; }
+
+  /* =========================================================
+     TARJETA PRINCIPAL CENTRADA
+     ========================================================= */
+  .tarjeta {
+    max-width: 560px; margin: 0 auto;
+    background: var(--blanco); border-radius: 28px;
+    padding: 32px 36px 36px;
+    box-shadow: 0 30px 60px rgba(0,0,0,.18);
+  }
+
+  /* Encabezado: logo + título */
+  .cabecera { text-align: center; margin-bottom: 22px; }
+  /* Logo en SVG: hereda el color con "currentColor" */
+  .logo { display: block; width: 190px; height: auto; margin: 0 auto 14px; color: var(--marca); }
+  .cabecera h1 { font-size: 20px; font-weight: 800; }
+  .cabecera p { color: var(--gris); font-size: 14px; margin-top: 4px; }
+
+  /* Búsqueda */
+  .buscar {
+    width: 100%; height: 44px; padding: 0 14px 0 40px;
+    border: 2px solid var(--marca-borde); border-radius: 12px;
+    background: var(--marca-suave) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M10 2a8 8 0 0 1 6.32 12.9l5.39 5.4-1.41 1.4-5.4-5.39A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z'/%3E%3C/svg%3E") no-repeat 12px center / 18px;
+  }
+  .buscar:focus { outline: none; border-color: var(--marca); background-color: var(--blanco); }
+
+  /* Pestañas de categoría */
+  .categorias {
+    display: flex; gap: 8px; overflow-x: auto; margin: 12px -4px 18px; padding: 0 4px;
+    scrollbar-width: none;
+  }
+  .categorias::-webkit-scrollbar { display: none; }
+  .cat {
+    flex: none; padding: 7px 14px; border-radius: 999px;
+    background: var(--marca-suave); color: var(--marca);
+    font-weight: 700; font-size: 13px; white-space: nowrap;
+  }
+  .cat.activa { background: var(--marca); color: var(--blanco); }
+
+  /* =========================================================
+     LISTA DE PRODUCTOS (filas seleccionables)
+     ========================================================= */
+  .lista { display: grid; gap: 12px; }
+  .producto {
+    position: relative;
+    display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 14px;
+    padding: 16px 18px; border-radius: var(--radio);
+    background: var(--marca-suave); border: 2px solid transparent;
+    cursor: pointer; transition: border-color .15s, background .15s, box-shadow .15s;
+    user-select: none;
+  }
+  .producto:hover { border-color: var(--marca-borde); }
+  .producto.seleccionado {
+    background: var(--blanco); border-color: var(--marca);
+    box-shadow: 0 6px 18px rgba(46,70,107,.18);
+  }
+  /* Producto destacado ("Más pedido") */
+  .producto.top { background: var(--destacado-suave); border-color: var(--destacado); padding-top: 26px; }
+  .producto.top.seleccionado { box-shadow: 0 0 0 4px rgba(245,158,11,.25); }
+  .etiqueta-top {
+    position: absolute; top: -2px; right: -2px;
+    background: var(--destacado); color: var(--marca-oscuro);
+    font-size: 11px; font-weight: 800; letter-spacing: 1.5px;
+    padding: 3px 12px; border-radius: 0 var(--radio) 0 10px;
+  }
+
+  .nombre { font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: .3px; }
+  .desc { color: var(--marca); opacity: .85; font-size: 13.5px; margin-top: 2px; }
+  .precio { font-weight: 800; font-size: 14px; margin-top: 4px; }
+
+  /* Círculo de selección (como un radio) */
+  .check {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--marca-borde); display: grid; place-items: center;
+    color: var(--blanco); font-weight: 900; font-size: 15px;
+  }
+  .seleccionado .check { background: var(--marca); border-color: var(--marca); }
+
+  /* Selector de cantidad: aparece solo cuando el producto está elegido */
+  .cantidad {
+    grid-column: 1 / -1;
+    display: none; align-items: center; justify-content: space-between; gap: 12px;
+    padding-top: 12px; margin-top: 2px; border-top: 1px dashed var(--marca-borde);
+  }
+  .seleccionado .cantidad { display: flex; }
+  .cantidad span { font-size: 13px; color: var(--gris); }
+  .stepper { display: flex; align-items: center; gap: 6px; }
+  .stepper button {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--marca); color: var(--blanco); font-size: 20px; font-weight: 800;
+  }
+  .stepper input {
+    width: 54px; height: 38px; text-align: center; font-weight: 800; font-size: 16px;
+    border: 2px solid var(--marca-borde); border-radius: 10px; -moz-appearance: textfield;
+  }
+  .stepper input::-webkit-inner-spin-button,
+  .stepper input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .sin-resultados {
+    text-align: center; color: var(--gris); padding: 22px;
+    border: 2px dashed var(--marca-borde); border-radius: var(--radio);
+  }
+
+  /* =========================================================
+     DATOS OPCIONALES + BOTÓN DE WHATSAPP
+     ========================================================= */
+  hr { border: 0; border-top: 1px solid #e2e8f0; margin: 26px 0 20px; }
+  label.campo { display: block; font-size: 14px; color: var(--marca); margin: 14px 0 6px; }
+  label.campo i { color: var(--gris); }
+  .campo-input {
+    width: 100%; padding: 12px 14px; border-radius: 12px;
+    border: 2px solid var(--marca-borde); resize: vertical;
+  }
+  .campo-input:focus { outline: none; border-color: var(--marca); }
+
+  .resumen-total {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin: 20px 2px 12px; font-size: 15px;
+  }
+  .resumen-total[hidden] { display: none; }
+  .resumen-total b { font-size: 24px; }
+
+  .btn-whatsapp {
+    width: 100%; min-height: 60px; border-radius: 14px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: var(--whatsapp); color: var(--blanco);
+    font-size: 17px; font-weight: 800; transition: background .15s;
+  }
+  .resumen-total:not([hidden]) + .btn-whatsapp { margin-top: 0; }
+  .btn-whatsapp:hover { background: var(--whatsapp-hover); }
+  .btn-whatsapp svg { width: 26px; height: 26px; fill: currentColor; flex: none; }
+  /* Estado deshabilitado: invita a elegir un producto */
+  .btn-whatsapp:disabled { background: var(--marca-suave); color: var(--marca); opacity: .8; cursor: default; }
+
+  .btn-copiar {
+    display: block; margin: 12px auto 0; color: var(--gris);
+    font-size: 13px; text-decoration: underline;
+  }
+  .btn-copiar[hidden] { display: none; }
+
+  .pie { text-align: center; color: var(--logo-claro); opacity: .8; font-size: 13px; margin-top: 22px; }
+  .pie b { color: var(--blanco); letter-spacing: 1px; }
+
+  /* Aviso breve */
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px);
+    background: var(--marca-oscuro); color: var(--blanco); font-weight: 700;
+    padding: 10px 18px; border-radius: 999px; opacity: 0; pointer-events: none;
+    transition: opacity .2s, transform .2s;
+  }
+  .toast.visible { opacity: 1; transform: translate(-50%, 0); }
+
+  /* =========================================================
+     TELÉFONO
+     ========================================================= */
+  @media (max-width: 520px) {
+    body { padding: 16px 10px 20px; }
+    .tarjeta { padding: 24px 16px 24px; border-radius: 22px; }
+    .producto { gap: 12px; padding: 14px; }
+    .producto.top { padding-top: 28px; }
+    .nombre { font-size: 15px; }
+    .etiqueta-top { font-size: 10px; letter-spacing: 1px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<main class="tarjeta">
+  <!-- ===================== ENCABEZADO ===================== -->
+  <header class="cabecera">
+    <!-- Imagotipo Inizi Tech (vectorial, incrustado) -->
+    <svg class="logo" viewBox="280 435 520 210" fill="currentColor" role="img" aria-label="Inizi Tech"><path d="M 523.39 445.17 L 543.92 445.17 L 543.92 536.95 L 523.39 536.95 Z M 523.39 445.17 "/><path d="M 601.51 536.95 L 601.51 500.94 C 601.51 497.73 600.48 495.11 598.39 493.07 C 596.32 491.04 593.71 490.02 590.59 490.02 C 588.51 490.02 586.65 490.47 585.00 491.38 C 583.36 492.29 582.06 493.57 581.10 495.22 C 580.15 496.87 579.67 498.77 579.67 500.94 L 572.00 497.17 C 572.00 492.23 573.11 487.89 575.32 484.17 C 577.53 480.44 580.56 477.56 584.42 475.52 C 588.28 473.49 592.63 472.47 597.48 472.47 C 602.08 472.47 606.19 473.55 609.83 475.72 C 613.48 477.89 616.33 480.81 618.41 484.49 C 620.5 488.17 621.53 492.18 621.53 496.52 L 621.53 536.95 Z M 559.66 473.77 L 579.67 473.77 L 579.67 536.95 L 559.66 536.95 Z M 559.66 473.77 "/><path d="M 634.14 473.77 L 654.16 473.77 L 654.16 536.95 L 634.14 536.95 Z M 644.15 465.19 C 641.12 465.19 638.56 464.10 636.48 461.94 C 634.40 459.77 633.36 457.17 633.36 454.14 C 633.36 451.02 634.40 448.42 636.48 446.34 C 638.56 444.26 641.12 443.22 644.15 443.22 C 647.36 443.22 649.94 444.26 651.89 446.34 C 653.84 448.42 654.81 451.02 654.81 454.14 C 654.81 457.17 653.84 459.77 651.89 461.94 C 649.94 464.10 647.36 465.19 644.15 465.19 "/><path d="M 666.25 490.54 L 666.25 473.77 L 720.07 473.77 L 720.07 485.47 L 705.90 490.54 Z M 664.04 536.95 L 664.04 525.25 L 678.21 520.18 L 719.16 520.18 L 719.16 536.95 Z M 664.04 525.25 L 695.63 485.47 L 720.07 485.47 L 688.22 525.25 Z M 664.04 525.25 "/><path d="M 730.60 473.77 L 750.62 473.77 L 750.62 536.95 L 730.60 536.95 Z M 740.61 465.19 C 737.57 465.19 735.02 464.10 732.94 461.94 C 730.86 459.77 729.82 457.17 729.82 454.14 C 729.82 451.02 730.86 448.42 732.94 446.34 C 735.02 444.26 737.57 443.22 740.61 443.22 C 743.82 443.22 746.39 444.26 748.35 446.34 C 750.30 448.42 751.27 451.02 751.27 454.14 C 751.27 457.17 750.30 459.77 748.35 461.94 C 746.39 464.10 743.82 465.19 740.61 465.19 "/><path d="M 552.91 544.73 L 573.58 544.73 L 573.58 635.34 L 552.91 635.34 Z M 524.18 561.50 L 524.18 543.56 L 719.56 543.31 L 719.56 561.25 Z M 524.18 561.50 "/><path d="M 627.57 636.77 C 620.72 636.77 614.65 635.36 609.37 632.55 C 604.08 629.73 599.92 625.81 596.89 620.78 C 593.85 615.76 592.34 610.04 592.34 603.62 C 592.34 597.38 593.81 591.77 596.76 586.79 C 599.70 581.80 603.73 577.88 608.85 575.02 C 613.96 572.16 619.72 570.73 626.14 570.73 C 632.46 570.73 638.01 572.08 642.78 574.76 C 647.54 577.45 651.31 581.18 654.09 585.94 C 656.86 590.71 658.25 596.17 658.25 602.32 C 658.25 603.54 658.18 604.77 658.05 606.03 C 657.92 607.28 657.64 608.69 657.21 610.25 L 602.87 610.51 L 602.87 596.73 L 648.63 596.47 L 640.05 602.32 C 639.96 598.77 639.40 595.80 638.36 593.42 C 637.32 591.03 635.78 589.19 633.74 587.89 C 631.71 586.59 629.26 585.94 626.40 585.94 C 623.28 585.94 620.57 586.68 618.27 588.15 C 615.98 589.63 614.20 591.66 612.94 594.26 C 611.68 596.86 611.06 599.98 611.06 603.62 C 611.06 607.26 611.73 610.43 613.07 613.11 C 614.41 615.80 616.32 617.86 618.79 619.29 C 621.26 620.72 624.19 621.43 627.57 621.43 C 630.60 621.43 633.37 620.89 635.89 619.81 C 638.40 618.73 640.61 617.10 642.51 614.93 L 653.57 625.85 C 650.45 629.58 646.67 632.33 642.26 634.11 C 637.84 635.88 632.94 636.77 627.57 636.77 "/><path d="M 698.28 636.77 C 691.70 636.77 685.76 635.34 680.48 632.48 C 675.19 629.62 671.05 625.68 668.06 620.65 C 665.07 615.63 663.58 610 663.58 603.75 C 663.58 597.43 665.09 591.77 668.12 586.79 C 671.16 581.80 675.32 577.88 680.60 575.02 C 685.89 572.16 691.83 570.73 698.42 570.73 C 703.44 570.73 708.01 571.58 712.13 573.27 C 716.25 574.96 719.91 577.45 723.12 580.75 L 710.25 593.75 C 708.77 592.10 707.06 590.88 705.11 590.10 C 703.16 589.32 700.93 588.93 698.42 588.93 C 695.64 588.93 693.15 589.56 690.94 590.82 C 688.73 592.08 687 593.81 685.74 596.02 C 684.48 598.23 683.85 600.76 683.85 603.62 C 683.85 606.57 684.48 609.17 685.74 611.42 C 687 613.68 688.75 615.43 691.01 616.69 C 693.26 617.94 695.73 618.57 698.42 618.57 C 701.01 618.57 703.33 618.14 705.37 617.27 C 707.41 616.41 709.16 615.15 710.64 613.50 L 723.51 626.25 C 720.12 629.71 716.37 632.33 712.26 634.11 C 708.14 635.88 703.48 636.77 698.28 636.77 "/><path d="M 772.67 635.34 L 772.67 599.33 C 772.67 596.13 771.64 593.51 769.55 591.47 C 767.48 589.43 764.87 588.41 761.76 588.41 C 759.67 588.41 757.81 588.87 756.17 589.78 C 754.52 590.69 753.22 591.97 752.26 593.61 C 751.31 595.26 750.83 597.17 750.83 599.33 L 743.17 595.56 C 743.17 590.62 744.23 586.29 746.35 582.56 C 748.47 578.84 751.40 575.96 755.12 573.92 C 758.85 571.88 763.10 570.86 767.87 570.86 C 772.80 570.86 777.14 571.88 780.87 573.92 C 784.59 575.96 787.5 578.77 789.57 582.37 C 791.66 585.96 792.69 590.15 792.69 594.91 L 792.69 635.34 Z M 730.57 635.26 L 730.47 543.19 L 750.50 543.23 L 750.60 635.30 Z M 730.57 635.26 "/><path d="M 428.48 554.92 L 372.26 554.91 L 372.26 535.44 L 428.49 535.45 Z M 428.48 554.92 "/><path d="M 489.19 633.27 L 372.26 633.28 L 372.26 598.94 L 489.19 598.93 Z M 489.19 633.27 "/><path d="M 335.22 633.41 L 334.74 513.99 L 369.30 513.99 L 369.34 633.41 Z M 287.30 511.36 L 287.30 482.33 L 488.78 482.33 L 488.78 511.07 "/><path d="M 369.34 479.90 L 334.73 479.90 L 334.73 443.22 L 369.34 443.22 Z M 369.34 479.90 "/></svg>
+    <h1>Haz tu pedido en segundos</h1>
+    <p>Elige tus productos y envíalo por WhatsApp. Sin registro.</p>
+  </header>
+
+  <!-- ===================== FILTROS ===================== -->
+  <input class="buscar" id="buscar" type="search" placeholder="Buscar producto…" aria-label="Buscar producto" autocomplete="off">
+  <nav class="categorias" id="categorias" aria-label="Categorías"></nav>
+
+  <!-- ===================== PRODUCTOS ===================== -->
+  <section class="lista" id="lista" aria-label="Productos"></section>
+
+  <hr>
+
+  <!-- ===================== DATOS OPCIONALES ===================== -->
+  <label class="campo" for="nombre">¿A nombre de quién? <i>(opcional)</i></label>
+  <input class="campo-input" id="nombre" type="text" placeholder="Ej: Ana — Empresa XYZ" autocomplete="name">
+
+  <label class="campo" for="notas">¿Alguna nota especial? <i>(opcional)</i></label>
+  <textarea class="campo-input" id="notas" rows="2" placeholder="Ej: entrega en oficina, lo necesito para el lunes…"></textarea>
+
+  <!-- ===================== TOTAL + ENVÍO ===================== -->
+  <div class="resumen-total" id="resumenTotal" hidden>
+    <span id="resumenItems"></span><b id="total"></b>
+  </div>
+
+  <button class="btn-whatsapp" id="btnWhatsapp" disabled>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 15l-1.5 5 5.2-1.4A9.9 9.9 0 1 0 12.04 2zm0 18.1a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3a8.2 8.2 0 1 1 7 3.9zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.7 11.7 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3z"/></svg>
+    <span id="textoBoton">Selecciona un producto para pedir</span>
+  </button>
+  <button class="btn-copiar" id="btnCopiar" hidden>o copia el pedido como texto</button>
+</main>
+
+<p class="pie"><b>INIZI TECH</b> · Pedidos rápidos por WhatsApp</p>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   CONFIGURACIÓN
+   ========================================================= */
+const CONFIG = {
+  negocio: 'Inizitech',
+  // Número de WhatsApp que recibe los pedidos: formato internacional,
+  // sin "+" ni espacios. Ej. Colombia: '573001234567'.
+  // Si se deja vacío, WhatsApp pedirá elegir el contacto.
+  whatsapp: '',
+  moneda: 'COP',
+  idioma: 'es-CO',
+  claveStorage: 'inizitech_pedido_v2'
+};
+
+/* =========================================================
+   PRODUCTOS DE EJEMPLO
+   Sin fotos a propósito: el cliente elige más rápido leyendo el nombre.
+   - desc: texto corto opcional (puede dejarse '').
+   - top: true marca el producto como "Más pedido".
+   ========================================================= */
+const PRODUCTOS = [
+  { id: 'p01', nombre: 'Laptop empresarial', desc: 'Core i5, 16 GB RAM, SSD 512 GB. Lista para trabajar.', precio: 2899000, categoria: 'Equipos', top: true },
+  { id: 'p02', nombre: 'Monitor 24"', desc: 'Full HD IPS, ideal para doble pantalla.', precio: 549000, categoria: 'Equipos' },
+  { id: 'p03', nombre: 'Mini PC', desc: 'Compacto y silencioso para recepción u oficina.', precio: 1490000, categoria: 'Equipos' },
+  { id: 'p04', nombre: 'Kit teclado + mouse', desc: 'Inalámbrico, un solo receptor USB.', precio: 129000, categoria: 'Accesorios' },
+  { id: 'p05', nombre: 'Diadema con micrófono', desc: 'Cancelación de ruido para llamadas.', precio: 159000, categoria: 'Accesorios' },
+  { id: 'p06', nombre: 'Cámara web 1080p', desc: 'Con micrófono integrado y tapa de privacidad.', precio: 169000, categoria: 'Accesorios' },
+  { id: 'p07', nombre: 'Router Wi-Fi 6', desc: 'Cobertura amplia para oficinas pequeñas.', precio: 349000, categoria: 'Redes' },
+  { id: 'p08', nombre: 'Cable de red Cat6', desc: 'Precio por metro.', precio: 3500, categoria: 'Redes' },
+  { id: 'p09', nombre: 'Soporte técnico', desc: 'Visita o remoto, por hora.', precio: 90000, categoria: 'Servicios' },
+  { id: 'p10', nombre: 'Licencia antivirus', desc: '1 equipo, 1 año de protección.', precio: 119000, categoria: 'Servicios' }
+];
+
+/* =========================================================
+   ESTADO
+   ========================================================= */
+const estado = { categoria: 'Todos', busqueda: '', carrito: {} }; // carrito: { id: cantidad }
+
+const $ = (s) => document.querySelector(s);
+const porId = Object.fromEntries(PRODUCTOS.map(p => [p.id, p]));
+const fmt = new Intl.NumberFormat(CONFIG.idioma, { style: 'currency', currency: CONFIG.moneda, maximumFractionDigits: 0 });
+const dinero = (n) => fmt.format(n);
+// Quita acentos y mayúsculas para que la búsqueda sea tolerante
+const normalizar = (t) => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const escapar = (s) => s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+/* =========================================================
+   GUARDADO LOCAL (para no perder el pedido al recargar)
+   ========================================================= */
+function guardar() {
+  try { localStorage.setItem(CONFIG.claveStorage, JSON.stringify({ carrito: estado.carrito, nombre: $('#nombre').value })); }
+  catch (e) { /* almacenamiento no disponible: no pasa nada */ }
+}
+function cargar() {
+  try {
+    const d = JSON.parse(localStorage.getItem(CONFIG.claveStorage) || '{}');
+    for (const [id, c] of Object.entries(d.carrito || {})) if (porId[id] && c > 0) estado.carrito[id] = c;
+    if (d.nombre) $('#nombre').value = d.nombre;
+  } catch (e) { /* datos corruptos: se ignoran */ }
+}
+
+/* =========================================================
+   RENDER: categorías
+   ========================================================= */
+function renderCategorias() {
+  const cats = ['Todos', ...new Set(PRODUCTOS.map(p => p.categoria))];
+  $('#categorias').innerHTML = cats.map(c =>
+    `<button class="cat ${c === estado.categoria ? 'activa' : ''}" data-cat="${c}">${c}</button>`).join('');
+}
+
+/* =========================================================
+   RENDER: lista de productos
+   ========================================================= */
+function htmlProducto(p) {
+  const cant = estado.carrito[p.id] || 0;
+  return `
+  <article class="producto ${p.top ? 'top' : ''} ${cant ? 'seleccionado' : ''}" data-id="${p.id}"
+           role="checkbox" aria-checked="${cant > 0}" tabindex="0">
+    ${p.top ? '<span class="etiqueta-top">🔥 MÁS PEDIDO</span>' : ''}
+    <div>
+      <div class="nombre">${p.nombre}</div>
+      ${p.desc ? `<div class="desc">${p.desc}</div>` : ''}
+      <div class="precio">${dinero(p.precio)}</div>
+    </div>
+    <div class="check">${cant ? '✓' : ''}</div>
+    <div class="cantidad">
+      <span>Cantidad</span>
+      <div class="stepper">
+        <button data-accion="restar" aria-label="Quitar uno">−</button>
+        <input type="number" min="1" inputmode="numeric" value="${cant || 1}" aria-label="Cantidad de ${p.nombre}">
+        <button data-accion="sumar" aria-label="Agregar uno">+</button>
+      </div>
+    </div>
+  </article>`;
+}
+
+function renderLista() {
+  const q = normalizar(estado.busqueda.trim());
+  const visibles = PRODUCTOS.filter(p =>
+    (estado.categoria === 'Todos' || p.categoria === estado.categoria) &&
+    (!q || normalizar(p.nombre + ' ' + (p.desc || '')).includes(q)));
+
+  $('#lista').innerHTML = visibles.length
+    ? visibles.map(htmlProducto).join('')
+    : `<p class="sin-resultados">No encontramos "<b>${escapar(estado.busqueda)}</b>". Prueba con otra palabra.</p>`;
+}
+
+/* Actualiza solo una fila (más rápido y no mueve el scroll) */
+function actualizarFila(id) {
+  const fila = document.querySelector(`.producto[data-id="${id}"]`);
+  if (!fila) return;
+  const cant = estado.carrito[id] || 0;
+  fila.classList.toggle('seleccionado', cant > 0);
+  fila.setAttribute('aria-checked', cant > 0);
+  fila.querySelector('.check').textContent = cant ? '✓' : '';
+  const input = fila.querySelector('.stepper input');
+  if (document.activeElement !== input) input.value = cant || 1;
+}
+
+/* =========================================================
+   RENDER: total y botón de WhatsApp
+   ========================================================= */
+function lineas() {
+  return Object.entries(estado.carrito).map(([id, cant]) => ({ p: porId[id], cant, sub: porId[id].precio * cant }));
+}
+function renderTotal() {
+  const ls = lineas();
+  const unidades = ls.reduce((s, l) => s + l.cant, 0);
+  const total = ls.reduce((s, l) => s + l.sub, 0);
+  const hay = ls.length > 0;
+
+  $('#resumenTotal').hidden = !hay;
+  $('#btnCopiar').hidden = !hay;
+  $('#btnWhatsapp').disabled = !hay;
+  $('#resumenItems').textContent = `${unidades} ${unidades === 1 ? 'unidad' : 'unidades'} · ${ls.length} ${ls.length === 1 ? 'producto' : 'productos'}`;
+  $('#total').textContent = dinero(total);
+  $('#textoBoton').textContent = hay ? `Pedir por WhatsApp · ${dinero(total)}` : 'Selecciona un producto para pedir';
+}
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+function fijar(id, cantidad) {
+  const c = Math.max(0, Math.min(999, Math.floor(Number(cantidad) || 0)));
+  if (c) estado.carrito[id] = c; else delete estado.carrito[id];
+  actualizarFila(id); renderTotal(); guardar();
+}
+// Tocar la fila alterna: si no está elegido lo agrega con 1, si ya está lo quita
+const alternar = (id) => fijar(id, estado.carrito[id] ? 0 : 1);
+
+/* Texto del pedido que se envía por WhatsApp */
+function textoPedido() {
+  const ls = lineas();
+  const total = ls.reduce((s, l) => s + l.sub, 0);
+  const nombre = $('#nombre').value.trim();
+  const notas = $('#notas').value.trim();
+  let t = `¡Hola ${CONFIG.negocio}! 👋 Quiero hacer este pedido:\n\n`;
+  ls.forEach(({ p, cant, sub }) => { t += `• ${cant} x ${p.nombre} — ${dinero(sub)}\n`; });
+  t += `\n*Total: ${dinero(total)}*`;
+  if (nombre) t += `\n\nA nombre de: ${nombre}`;
+  if (notas) t += `\nNota: ${notas}`;
+  return t;
+}
+
+function enviarWhatsapp() {
+  if (!lineas().length) return;
+  const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(textoPedido())}`;
+  window.open(url, '_blank', 'noopener');
+}
+
+async function copiar() {
+  const t = textoPedido();
+  try { await navigator.clipboard.writeText(t); }
+  catch (e) { // alternativa si el navegador bloquea el portapapeles (ej. al abrir el archivo local)
+    const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove();
+  }
+  aviso('Pedido copiado ✔');
+}
+
+let tAviso;
+function aviso(m) {
+  const el = $('#toast'); el.textContent = m; el.classList.add('visible');
+  clearTimeout(tAviso); tAviso = setTimeout(() => el.classList.remove('visible'), 1600);
+}
+
+/* =========================================================
+   EVENTOS (delegados: funcionan aunque la lista se redibuje)
+   ========================================================= */
+$('#lista').addEventListener('click', (e) => {
+  const fila = e.target.closest('.producto'); if (!fila) return;
+  const id = fila.dataset.id;
+  const btn = e.target.closest('[data-accion]');
+  if (btn) { fijar(id, (estado.carrito[id] || 0) + (btn.dataset.accion === 'sumar' ? 1 : -1)); return; }
+  if (e.target.closest('.cantidad')) return;   // clic dentro del selector: no alternar
+  alternar(id);
+});
+// Teclado: Espacio/Enter sobre una fila la selecciona
+$('#lista').addEventListener('keydown', (e) => {
+  if (e.target.classList.contains('producto') && (e.key === ' ' || e.key === 'Enter')) {
+    e.preventDefault(); alternar(e.target.dataset.id);
+  }
+  if (e.target.matches('.stepper input') && e.key === 'Enter') e.target.blur();
+});
+// Escribir la cantidad directamente
+$('#lista').addEventListener('input', (e) => {
+  if (!e.target.matches('.stepper input') || e.target.value === '') return;
+  fijar(e.target.closest('.producto').dataset.id, e.target.value);
+});
+// Al salir del campo, si quedó vacío o en 0 se quita el producto
+$('#lista').addEventListener('focusout', (e) => {
+  if (e.target.matches('.stepper input')) {
+    const id = e.target.closest('.producto').dataset.id;
+    setTimeout(() => fijar(id, e.target.value), 0);
+  }
+});
+
+$('#categorias').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-cat]'); if (!b) return;
+  estado.categoria = b.dataset.cat; renderCategorias(); renderLista();
+});
+$('#buscar').addEventListener('input', (e) => { estado.busqueda = e.target.value; renderLista(); });
+$('#btnWhatsapp').addEventListener('click', enviarWhatsapp);
+$('#btnCopiar').addEventListener('click', copiar);
+$('#nombre').addEventListener('input', guardar);
+
+/* =========================================================
+   INICIO
+   ========================================================= */
+cargar();
+renderCategorias();
+renderLista();
+renderTotal();
+</script>
+
+<!--
+=====================================================================
+DECISIONES TOMADAS (a favor de la rapidez del pedido)
+=====================================================================
+1. Una sola tarjeta centrada: el cliente ve todo en una pantalla y baja
+   con el pulgar.
+2. Tocar un producto lo selecciona con cantidad 1; ahí mismo aparece el
+   selector − / + (o se escribe el número). Tocar de nuevo lo quita.
+3. El botón verde envía DIRECTO a WhatsApp con el pedido ya redactado:
+   un solo toque, sin pantallas intermedias. Mientras no hay productos,
+   el botón dice "Selecciona un producto para pedir".
+4. "Copiar pedido" queda como opción secundaria por si el cliente prefiere
+   pegarlo en otro chat o correo.
+5. Nombre y notas son opcionales; no hay registro ni inicio de sesión.
+6. Búsqueda y categorías arriba, compactas, para catálogos más grandes.
+7. Colores tomados del imagotipo (azul #2e466b y gris #e5e5e5). El logo va
+   incrustado en SVG para que el archivo funcione solo, sin imágenes aparte.
+   El botón de WhatsApp conserva su verde para que se reconozca al instante.
+8. Moneda en pesos colombianos (COP) sin decimales; se cambia en CONFIG.
+9. El pedido se guarda en el navegador por si se recarga la página.
+10. Sin fotos de producto: nombre + precio se leen más rápido y el archivo
+    no depende de imágenes. La descripción es opcional.
+=====================================================================
+-->
+</body>
+</html>
