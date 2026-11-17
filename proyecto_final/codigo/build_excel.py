@@ -67,7 +67,7 @@ rows = [
  ("Sobrecosto sobre capacidad regular", "extra", S["sobrecosto_extra"], "COP/t", "SUPUESTO", "Compra de clínker / molienda adicional (~0,75 t x ~80.000 COP/t de sobreprecio)", "Declarar"),
  ("Costo de cambiar el ritmo de producción", "cambio", S["costo_cambio"], "COP/t cambiada", "SUPUESTO", "Arranques/paradas del horno y ajuste de turnos", "Declarar"),
  ("Capacidad adicional con recursos extra", "extra_cap", S["extra_cap"], "%", "SUPUESTO", "Máximo extra por compra de clínker y turnos", "Declarar"),
- ("Inventario inicial de cemento terminado", "inv0", S["inv_ini"], "kt", "SUPUESTO", "~1 mes de demanda a diciembre de 2026", "Declarar"),
+ ("Inventario inicial de cemento terminado", "inv0", S["inv_ini"], "kt", "SUPUESTO", "~10 días de demanda a diciembre de 2026", "Declarar"),
  ("Vida útil / máximo inventario terminado", "maxinv", S["max_inv_meses"], "meses", "SUPUESTO", "El cemento en saco se endurece con humedad; máximo ~1,5 meses de demanda", "Sí"),
  ("Mezcla: Uso General en saco", "mix_ug", S["mix"]["UG saco"], "%", "SUPUESTO", "Referencia clave del MPS", "Declarar"),
  ("Mezcla: Estructural en saco", "mix_est", S["mix"]["Estructural saco"], "%", "SUPUESTO", "", "Declarar"),
