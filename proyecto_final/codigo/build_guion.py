@@ -5,10 +5,11 @@ d=Document(); st=d.styles["Normal"]; st.font.name="Calibri"; st.font.size=Pt(11)
 for s in d.sections: s.left_margin=s.right_margin=Cm(2.2); s.top_margin=s.bottom_margin=Cm(2)
 d.add_heading("Guion del pitch y preparación de la sustentación",1)
 d.add_paragraph("Duración objetivo: unos 12 minutos (la guía permite de 8 a 20), más unos 5 minutos de preguntas. Los cuatro integrantes deben hablar.")
-d.add_heading("Reparto y tiempos",2)
-t=d.add_table(rows=1,cols=4); t.style="Table Grid"
-for i,h in enumerate(["Integrante","Diapositivas","Tiempo","Mensaje central"]): t.rows[0].cells[i].text=h
-for r in [("Natalia Aragón","1–5 y 16","3,5 min","Quiénes somos, la empresa, el problema, cómo se conectan los análisis y las recomendaciones"),("Mary Barrera","6–9","3 min","Holt-Winters por menor error; demanda de 5.518 kt; el horno es la etapa más cargada; estrategia de ajuste"),("Brandon Afanador","10–12 y 17","3 min","Tres estrategias, la mixta gana; MPS y ATP de la referencia UG; supuestos y limitaciones"),("María Auxiliadora Salcedo","13–15 y 18","3 min","La restricción y cómo explotarla; tablero de indicadores; conclusiones")]:
+d.add_heading("Bloques y tiempos sugeridos",2)
+d.add_paragraph("El reparto de quién presenta cada bloque lo define el equipo; aquí solo se sugiere cómo dividir las diapositivas y el tiempo. Los cuatro integrantes deben hablar.")
+t=d.add_table(rows=1,cols=3); t.style="Table Grid"
+for i,h in enumerate(["Diapositivas","Tiempo","Mensaje central"]): t.rows[0].cells[i].text=h
+for r in [("1–5","3 min","Quiénes somos, la empresa, el problema y cómo se conectan los análisis"),("6–9","3 min","Holt-Winters por menor error; demanda de 5.518 kt; el horno es la etapa más cargada; estrategia de ajuste"),("10–12","3 min","Tres estrategias, la mixta gana; MPS y ATP de la referencia UG"),("13–15","3 min","La restricción y cómo explotarla; tablero de indicadores"),("16–18","2,5 min","Recomendaciones, supuestos y limitaciones, conclusiones")]:
     c=t.add_row().cells
     for i,v in enumerate(r): c[i].text=v
 d.add_paragraph()
