@@ -29,7 +29,7 @@ def title(ws, t, sub=None):
 
 # ------------------------------------------------------------ LÉAME
 ws = wb.active; ws.title = "Leame"
-title(ws, "Proyecto Final - Cementos Argos (cemento gris, Colombia)", "Consultoría simulada · Prospectiva Tecnológica & Producción Inteligente · Usergio Arboleda Barranquilla")
+title(ws, "Proyecto Final - Cementos Argos (cemento gris, Colombia)", "Consultoría simulada · Prospectiva Tecnológica & Producción Inteligente · Universidad Sergio Arboleda Barranquilla")
 lines = [
  "Este libro contiene todos los cálculos del proyecto. Flujo: Supuestos → Historico → Pronostico → Capacidad → Agregado → MPS → TOC → Tablero.",
  "Convención de color: AZUL = dato de entrada o supuesto (editable). NEGRO = fórmula. Cambie un supuesto en la hoja 'Supuestos' y todo se recalcula.",
