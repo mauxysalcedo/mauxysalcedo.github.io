@@ -64,7 +64,7 @@ fig,ax=plt.subplots(figsize=(9,1.7)); ax.axis("off")
 steps=["Supuestos","Pronóstico\nde demanda","Capacidad","Plan\nagregado","MPS / ATP","Tablero de\nindicadores"]
 for i,s in enumerate(steps):
     ax.text(i*1.5,0,s,ha="center",va="center",fontsize=9,color="white",fontweight="bold",bbox=dict(boxstyle="round,pad=.5",fc=NAVY if i else GOLD,ec="none"))
-    if i<len(steps)-1: ax.annotate("",xy=(i*1.5+.72,0),xytext=(i*1.5+.78,0),arrowprops=dict(arrowstyle="-|>",color=GRAY))
+    if i<len(steps)-1: ax.annotate("",xy=(i*1.5+.97,0),xytext=(i*1.5+.58,0),arrowprops=dict(arrowstyle="-|>",color=GRAY,lw=1.6))
 ax.set_xlim(-.8,8.3); ax.set_ylim(-.6,.6); fig.tight_layout(); fig.savefig("fig/f7_flujo.png"); plt.close()
 # 8 diagrama de proceso
 fig,ax=plt.subplots(figsize=(9,1.8)); ax.axis("off")
