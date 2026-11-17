@@ -1,3 +1,5 @@
+import os
+os.chdir("/home/user/mauxysalcedo.github.io/proyecto_final")
 from pptx import Presentation
 from pptx.util import Inches, Pt, Emu
 from pptx.dml.color import RGBColor
@@ -16,9 +18,9 @@ blank=prs.slide_layouts[6]
 A,B,C=M.PLANES; P=M.MEJOR_PLAN["P"]
 ES=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"]; mes=lambda d:f"{ES[d.month-1]}-{str(d.year)[2:]}"
 months_over=[mes(M.PLAN_LABEL[i]) for i in range(12) if M.CLK_REQ[i]>M.CLK_CAP]
-clk_def=np.maximum(0,M.CLK_REQ-M.CLK_CAP).sum(); val_mix=clk_def*1000*(M.TOC["UG saco"]["T_clk"]-M.TOC["Granel"]["T_clk"])/1e6
+clk_def=np.maximum(0,M.CLK_REQ-M.CLK_CAP).sum()
 esc_disp=(M.ESC_BASE["total"]-M.ESC_DISP["total"])/1e6; esc_fc=(M.ESC_BASE["total"]-M.ESC_FC["total"])/1e6
-tb=load_workbook("recalc/Proyecto_Argos_Modelo_y_Tablero.xlsx",data_only=True)["Tablero"]
+tb=load_workbook("Proyecto_Argos_Modelo_y_Tablero.xlsx",data_only=True)["Tablero"]
 kpi={tb.cell(row=r,column=1).value:(tb.cell(row=r,column=3).value,tb.cell(row=r,column=6).value) for r in range(22,27)}
 num=[0]
 def slide(titulo, notas="", seccion=""):
@@ -74,24 +76,23 @@ bg=s.shapes.add_shape(MSO_SHAPE.RECTANGLE,0,0,prs.slide_width,prs.slide_height);
 g=s.shapes.add_shape(MSO_SHAPE.RECTANGLE,Inches(0.8),Inches(3.55),Inches(2.2),Inches(0.08)); g.fill.solid(); g.fill.fore_color.rgb=GOLD; g.line.fill.background()
 text(s,0.8,1.2,11.5,1.2,["Consultoría de producción inteligente"],size=22,bullet=False,color=GOLD)
 text(s,0.8,1.9,11.7,1.6,["Cementos Argos: cómo planear y programar la producción de cemento gris en Colombia"],size=38,bullet=False,color=WHITE)
-text(s,0.8,3.85,11.5,2.6,["Prospectiva Tecnológica & Producción Inteligente · 2026-03","Universidad Sergio Arboleda — Barranquilla","Docente: Natasha Charris","Equipo: [nombres de los integrantes]"],size=18,bullet=False,color=RGBColor(0xDD,0xE3,0xEE))
+text(s,0.8,3.85,11.5,2.6,["Prospectiva Tecnológica & Producción Inteligente · 2026-03","Universidad Sergio Arboleda — Barranquilla","Docente: Natasha Charris","Equipo: Brandon Afanador, Natalia Aragón, Mary Barrera y María Auxiliadora Salcedo Pérez"],size=18,bullet=False,color=RGBColor(0xDD,0xE3,0xEE))
 s.notes_slide.notes_text_frame.text="Integrante 1 (30 s): saludo, equipo y qué haremos: diagnóstico de la producción de cemento gris de Argos Colombia y recomendaciones."
 
 # 2 agenda
 s=slide("Agenda","Integrante 1 (30 s).")
-text(s,0.8,1.5,6,5,["**1.** La empresa y el problema","**2.** Pronóstico de demanda","**3.** Capacidad","**4.** Plan agregado","**5.** MPS y ATP","**6.** Restricción (TOC)","**7.** Tablero de indicadores","**8.** Recomendaciones y conclusiones"],size=24,bullet=False)
+text(s,0.8,1.5,6,5,["**1.** La empresa y el problema","**2.** Pronóstico de demanda","**3.** Capacidad","**4.** Plan agregado","**5.** MPS y ATP","**6.** Tablero de indicadores","**7.** Recomendaciones y conclusiones"],size=24,bullet=False)
 callout(s,7.6,2.0,5,3.2,"**Hilo conductor:** cada análisis alimenta al siguiente y todos apuntan a una decisión: cómo producir al menor costo sin dejar de cumplir la demanda.",size=20)
 
 # 3 empresa
 s=slide("La empresa: Argos en Colombia","Integrante 1 (1 min). Datos públicos: DANE y Grupo Argos. La participación es calculada por nosotros.")
 text(s,0.6,1.4,6.4,5.4,["**Cementera colombiana** con operaciones en Colombia, el Caribe y Centroamérica","**Alcance:** cemento gris, regional Colombia, 12 meses (dic-26 a nov-27)","**Sistema productivo:** proceso continuo en el horno de clínker; lotes o campañas en molienda y ensacado","**Productos (supuesto):** uso general en saco 45 %, estructural en saco 20 %, granel 35 %"],size=19)
 tabla(s,7.2,1.6,5.6,["Dato público","Valor"],[["Despachos nacionales 2024",f1(S["nac_2024"])+" kt"],["Despachos nacionales 2025",f1(S["nac_2025"])+" kt"],["Crecimiento 2025",pc(S["nac_2025"]/S["nac_2024"]-1)],["Argos Colombia 2025","5.000 kt"],["Participación (calculada)",pc(S["share"])]],[3.6,2.0],size=14,rowh=0.5)
-text(s,7.2,5.0,5.6,1.5,["Fuentes: DANE (ECG) y Grupo Argos (2026)."],size=12,bullet=False,color=GRAY)
 
 # 4 problema
 s=slide("El problema de consultoría","Integrante 1. Explicar la pregunta guía y mostrar el proceso.")
 img(s,"fig/f8_proceso.png",0.6,1.4,w=12.1)
-callout(s,0.9,3.9,11.5,1.5,"**¿Cómo debe planear y programar Argos su producción de cemento gris durante los próximos 12 meses para cumplir la demanda al menor costo, identificando y protegiendo la etapa que limita el sistema?**",size=20)
+callout(s,0.9,3.9,11.5,1.5,"**¿Cómo debe planear y programar Argos su producción de cemento gris durante los próximos 12 meses para cumplir la demanda al menor costo, identificando la etapa que más limita el sistema?**",size=20)
 text(s,0.9,5.7,11.5,1.2,["La demanda es estacional y crece cerca de 5 % al año; el horno, el activo más caro y menos flexible, tiene capacidad fija."],size=17,bullet=False,color=GRAY)
 
 # 5 coherencia
@@ -114,7 +115,7 @@ text(s,9.0,1.6,3.9,5,[f"**{f0(M.DEM.sum())} kt** en 12 meses",f"Mínimo: {f1(M.D
 s=slide("Capacidad (1/2): el horno es la etapa más cargada","Integrante 3 (1 min). Capacidades diseñadas son supuestos declarados.")
 rows=[[k,f1(M.CAPD[k]),f1(M.CAPE[k]),f1(M.REQ[k].mean()),pc(M.UTIL_AVG[k]),pc(M.UTIL_MAX[k])] for k in M.REQ]
 tabla(s,0.6,1.5,12.1,["Etapa (kt/mes)","Diseñada","Efectiva","Requerida media","Utilización media","Utilización pico"],rows,[3.4,1.8,1.8,1.9,1.8,1.4],size=15,rowh=0.6)
-callout(s,0.6,4.2,12.1,1.3,f"**Restricción: horno de clínker** ({pc(M.UTIL_AVG['Horno (clínker)'])} de utilización media; supera 100 % en el pico). Capacidad regular del sistema: **{f1(M.CAP_CEM_REG)} kt/mes** de cemento.",size=19)
+callout(s,0.6,4.2,12.1,1.3,f"**Etapa más cargada: horno de clínker** ({pc(M.UTIL_AVG['Horno (clínker)'])} de utilización media; supera 100 % en el pico). Capacidad regular del sistema: **{f1(M.CAP_CEM_REG)} kt/mes** de cemento.",size=19)
 text(s,0.6,5.7,12.1,1.2,["Efectiva = diseñada × disponibilidad o eficiencia (88 % horno, 90 % molienda, 85 % ensacado). Supuestos del equipo, a validar con datos internos."],size=14,bullet=False,color=GRAY)
 
 # 9 capacidad 2
@@ -140,38 +141,54 @@ rows=[[r[0],f0(r[1]),f0(r[2]),f0(r[3]) if r[3] else "—",f0(r[4]),f0(M.ATP[i]) 
 tabla(s,0.5,1.4,7.4,["Sem.","Pronóstico","Pedidos","MPS","Inv. proy.","ATP"],rows,[0.7,1.3,1.3,1.3,1.5,1.3],size=11,rowh=0.37)
 text(s,8.2,1.5,4.8,5.3,["Campañas **quincenales** de 90.900 t (180% del plan mensual × 45 %)".replace("180% del plan mensual × 45 %","= mitad del plan mensual de la referencia"),"**ATP** = MPS (+ inventario inicial) − pedidos hasta la próxima campaña",f"Semana 3: ATP de solo {f0(M.ATP[2])} t → ofrecer pedidos nuevos grandes en la semana 5 ({f0(M.ATP[4])} t)","**Control:** suma mensual del MPS = plan agregado × participación (cuadra)"],size=16)
 
-# 13 TOC 1
-s=slide("TOC paso 1: identificar la restricción","Integrante 5 (1 min). La restricción es estacional: en meses bajos el límite es el mercado.")
-img(s,"fig/f6_toc.png",0.4,1.4,w=8.6)
-text(s,9.2,1.5,3.8,5.3,["El **horno de clínker** es la restricción","Supera su capacidad en "+", ".join(months_over),"Es **estacional**: en dic–mar el límite es el mercado, no el horno","Por eso el plan acumula inventario antes del pico"],size=16)
-
-# 14 TOC 2
-s=slide("TOC paso 2: explotar la restricción","Integrante 5 (1 min). Trúput = precio − costo totalmente variable; se ordena por trúput por tonelada de clínker.")
-rows=[[p,f0(M.TOC[p]["T"]),f"{S['fclk_prod'][p]:.2f}".replace(".",","),f0(M.TOC[p]["T_clk"])] for p in M.TOC]
-tabla(s,0.6,1.5,7.2,["Producto","T (COP/t)","Factor clínker","T por t de clínker"],rows,[2.6,1.5,1.5,1.6],size=14,rowh=0.55)
-text(s,0.6,3.9,7.2,3,[f"**Priorizar UG en saco** cuando falte clínker ({', '.join(months_over)}): ≈ {f0(val_mix)} MM COP frente a asignarlo a granel","**Proteger la disponibilidad:** +2 pp con mantenimiento predictivo libera ≈ "+f0(M.cem_extra_anual)+" kt de cemento al año"],size=16)
-callout(s,8.2,1.6,4.7,3.2,"El estructural deja más trúput por tonelada de cemento, pero consume más clínker: **por unidad de restricción** rinde menos que el UG.",size=18)
-
 # 15 tablero
 s=slide("Tablero de indicadores (datos simulados)","Integrante 5 (1 min). Mostrar el Excel: selector de mes, semáforos y gráficos.")
 img(s,"fig/f9_tablero.png",0.4,1.3,w=7.9)
-rows=[["MAPE","≤5 %",pc(kpi["MAPE del pronóstico"][0]),kpi["MAPE del pronóstico"][1]],["Utiliz. horno","85–100 %",pc(kpi["Utilización del horno (restricción)"][0]),kpi["Utilización del horno (restricción)"][1]],["Cumpl. MPS","≥97 %",pc(kpi["Cumplimiento del MPS"][0]),kpi["Cumplimiento del MPS"][1]],["Fill rate","≥98 %",pc(kpi["Fill rate (nivel de servicio)"][0]),kpi["Fill rate (nivel de servicio)"][1]],["Factor clínker (ESG)","≤0,74",f"{kpi['Factor clínker (ESG)'][0]:.3f}".replace(".",","),kpi["Factor clínker (ESG)"][1]]]
+rows=[["MAPE","≤5 %",pc(kpi["MAPE del pronóstico"][0]),kpi["MAPE del pronóstico"][1]],["Utiliz. horno","85–100 %",pc(kpi["Utilización del horno"][0]),kpi["Utilización del horno"][1]],["Cumpl. MPS","≥97 %",pc(kpi["Cumplimiento del MPS"][0]),kpi["Cumplimiento del MPS"][1]],["Fill rate","≥98 %",pc(kpi["Fill rate (nivel de servicio)"][0]),kpi["Fill rate (nivel de servicio)"][1]],["Factor clínker (ESG)","≤0,74",f"{kpi['Factor clínker (ESG)'][0]:.3f}".replace(".",","),kpi["Factor clínker (ESG)"][1]]]
 tabla(s,8.5,1.5,4.5,["Indicador","Meta","Prom.","Estado"],rows,[1.7,0.9,0.9,1.0],size=11,rowh=0.5)
 text(s,8.5,4.6,4.5,2,["5 indicadores, cada uno ligado a un componente","Selector de mes y semáforos en el Excel"],size=14,color=GRAY)
 
 # 16 recomendaciones
 s=slide("Recomendaciones priorizadas","Integrante 1 o 2 (1,5 min). Valores no aditivos; no incluyen costo de implementación.")
-rows=[["1","Adoptar el plan mixto",f"{f0((A['total']-C['total'])/1e6)} / {f0((B['total']-C['total'])/1e6)}","Cumpl. MPS; fill rate"],["2","Bajar factor clínker a 0,72 (ESG)",f"{f0(esc_fc)} + {f0(M.CO2_AHORRO)} kt CO₂/año","Factor clínker"],["3","+2 pp de disponibilidad del horno",f"{f0(esc_disp)}","Utilización / disponibilidad"],["4","Clínker escaso a UG antes que a granel",f"{f0(val_mix)}","T por t de clínker"]]
+rows=[["1","Adoptar el plan mixto",f"{f0((A['total']-C['total'])/1e6)} / {f0((B['total']-C['total'])/1e6)}","Cumpl. MPS; fill rate"],["2","Bajar factor clínker a 0,72 (ESG)",f"{f0(esc_fc)} + {f0(M.CO2_AHORRO)} kt CO₂/año","Factor clínker"],["3","+2 pp de disponibilidad del horno",f"{f0(esc_disp)}","Utilización / disponibilidad"]]
 tabla(s,0.5,1.5,12.3,["N.º","Recomendación","Impacto (MM COP)","Indicador"],rows,[0.7,5.0,3.6,3.0],size=15,rowh=0.7)
-text(s,0.5,5.0,12.3,1.8,["**Industria 4.0:** mantenimiento predictivo del horno (sensores y analítica).","**ESG:** menos clínker = menos emisiones y más capacidad en la restricción."],size=17)
+text(s,0.5,5.0,12.3,1.8,["**Industria 4.0:** mantenimiento predictivo del horno (sensores y analítica).","**ESG:** menos clínker = menos emisiones y más capacidad en el horno."],size=17)
 
 # 17 supuestos y limitaciones
 s=slide("Supuestos y limitaciones","Integrante 3 o 4 (1 min). Ser transparentes: es lo que pide la docente.")
 text(s,0.6,1.4,6,5.5,["**Datos públicos:** DANE y Grupo Argos (totales anuales, acumulado 2026, Argos Colombia 2025)","**Reconstruido:** serie mensual histórica, calibrada con esos totales","**Supuestos declarados:** capacidades, precios, costos, mezcla","**Simulado:** pedidos del MPS y datos del tablero"],size=18)
-text(s,6.9,1.4,6,5.5,["**Limitaciones:**","La serie es corta (el error del pronóstico es in-sample)","El horno como restricción depende de las capacidades supuestas","No se estimó el costo de implementar las recomendaciones","Participación de mercado constante"],size=18)
+text(s,6.9,1.4,6,5.5,["**Limitaciones:**","La serie es corta (el error del pronóstico es in-sample)","La etapa más cargada depende de las capacidades supuestas","No se estimó el costo de implementar las recomendaciones","Participación de mercado constante"],size=18)
 
 # 18 conclusiones
 s=slide("Conclusiones","Integrante 5 (1 min) y cierre. Abrir a preguntas.")
-text(s,0.6,1.4,12.2,4.4,[f"Demanda de **{f0(M.DEM.sum())} kt** (≈ +5 % anual); Holt-Winters, el método más preciso","El **horno de clínker** es la restricción, de naturaleza estacional","La **estrategia mixta** minimiza el costo y cumple el 100 % de la demanda sin comprar clínker","MPS coherente con el plan; TOC convierte el diagnóstico en decisiones: priorizar UG y proteger el horno","Reducir el factor clínker une **productividad y sostenibilidad**"],size=20)
+text(s,0.6,1.4,12.2,4.4,[f"Demanda de **{f0(M.DEM.sum())} kt** (≈ +5 % anual); Holt-Winters, el método más preciso","El **horno de clínker** es la etapa más cargada y solo supera su capacidad en el pico","La **estrategia mixta** minimiza el costo y cumple el 100 % de la demanda sin comprar clínker","MPS coherente con el plan agregado; el ATP indica cuánto se puede prometer en cada campaña","Reducir el factor clínker une **productividad y sostenibilidad**"],size=20)
 callout(s,0.6,5.7,12.2,1.0,"Gracias. ¿Preguntas?",size=26)
+
+def src(slide,txt):
+    tf=slide.shapes.add_textbox(Inches(0.6),Inches(6.72),Inches(12.1),Inches(0.35)).text_frame; tf.word_wrap=True
+    r=tf.paragraphs[0].add_run(); r.text=txt; r.font.size=Pt(11); r.font.italic=True; r.font.color.rgb=GRAY
+SL=prs.slides
+src(SL[2],"Fuentes: Departamento Administrativo Nacional de Estadística [DANE] (2026); Grupo Argos (2026). Participación calculada por el equipo.")
+src(SL[5],"Medidas de error y método: Heizer et al. (2020); Hyndman y Athanasopoulos (2021); Winters (1960).")
+src(SL[7],"Definiciones de capacidad: Heizer et al. (2020). Capacidades de diseño: supuestos del equipo.")
+src(SL[9],"Estrategias de planeación agregada: Heizer et al. (2020). Costos: supuestos del equipo.")
+src(SL[11],"Lógica de MPS y ATP: Vollmann et al. (2005). Pedidos firmes simulados.")
+s=slide("Referencias")
+refs=[("Argos. (2025). ","Reporte integrado Cementos Argos 2024",". https://files.grupoargos.com/uploads-grupo-argos/2025/03/Reporte-Integrado-cementos-argos-2024.pdf"),
+("Departamento Administrativo Nacional de Estadística. (2026). ","Estadísticas de cemento gris (ECG): boletines técnicos",". https://www.dane.gov.co/index.php/en/statistics-by-topic-1/construction/estadisticas-de-cemento-gris"),
+("Grupo Argos. (2026). ","Informe de gestión Grupo Argos 2025",". https://files.grupoargos.com/uploads-grupo-argos/2026/03/InformeGestion_GrupoArgos_2025.pdf"),
+("Heizer, J., Render, B., & Munson, C. (2020). ","Operations management: Sustainability and supply chain management"," (13.ª ed.). Pearson."),
+("Hyndman, R. J., & Athanasopoulos, G. (2021). ","Forecasting: Principles and practice"," (3.ª ed.). OTexts. https://otexts.com/fpp3/"),
+("Vollmann, T. E., Berry, W. L., Whybark, D. C., & Jacobs, F. R. (2005). ","Manufacturing planning and control for supply chain management"," (5.ª ed.). McGraw-Hill."),
+("Winters, P. R. (1960). Forecasting sales by exponentially weighted moving averages. ","Management Science, 6","(3), 324–342. https://doi.org/10.1287/mnsc.6.3.324")]
+tf=s.shapes.add_textbox(Inches(0.6),Inches(1.35),Inches(12.1),Inches(5.6)).text_frame; tf.word_wrap=True
+for i,(a_,b_,c_) in enumerate(refs):
+    p=tf.paragraphs[0] if i==0 else tf.add_paragraph(); p.space_after=Pt(6)
+    for t,it in ((a_,False),(b_,True),(c_,False)):
+        r=p.add_run(); r.text=t; r.font.size=Pt(13); r.italic=it; r.font.color.rgb=NAVY; r.font.name="Times New Roman"
+import re as _re
+for sl in prs.slides:
+    if sl.has_notes_slide:
+        tf_=sl.notes_slide.notes_text_frame
+        t_=_re.sub(r"^Integrante [\d o]+\s*","",tf_.text); t_=_re.sub(r"^\(","(",t_); tf_.text=t_
 prs.save("Presentacion_Proyecto_Final_Argos.pptx"); print("slides",num[0])

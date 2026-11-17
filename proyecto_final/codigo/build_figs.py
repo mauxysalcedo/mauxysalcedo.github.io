@@ -1,4 +1,5 @@
-import numpy as np, matplotlib
+import numpy as np, matplotlib, os
+os.chdir("/home/user/mauxysalcedo.github.io/proyecto_final")
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import modelo as M
@@ -60,11 +61,11 @@ ax.set_ylim(280,390); ax.set_xticks(range(12)); ax.set_xticklabels([fmt(d) for d
 fig.tight_layout(); fig.savefig("fig/f6_toc.png"); plt.close()
 # 7 flujo de coherencia
 fig,ax=plt.subplots(figsize=(9,1.7)); ax.axis("off")
-steps=["Supuestos","Pronóstico\n(C2)","Capacidad\n(C3)","Plan agregado\n(C4)","MPS / ATP\n(C5)","TOC\n(C6)","Tablero\n(C7)"]
+steps=["Supuestos","Pronóstico\nde demanda","Capacidad","Plan\nagregado","MPS / ATP","Tablero de\nindicadores"]
 for i,s in enumerate(steps):
     ax.text(i*1.5,0,s,ha="center",va="center",fontsize=9,color="white",fontweight="bold",bbox=dict(boxstyle="round,pad=.5",fc=NAVY if i else GOLD,ec="none"))
     if i<len(steps)-1: ax.annotate("",xy=(i*1.5+.72,0),xytext=(i*1.5+.78,0),arrowprops=dict(arrowstyle="-|>",color=GRAY))
-ax.set_xlim(-.8,9.8); ax.set_ylim(-.6,.6); fig.tight_layout(); fig.savefig("fig/f7_flujo.png"); plt.close()
+ax.set_xlim(-.8,8.3); ax.set_ylim(-.6,.6); fig.tight_layout(); fig.savefig("fig/f7_flujo.png"); plt.close()
 # 8 diagrama de proceso
 fig,ax=plt.subplots(figsize=(9,1.8)); ax.axis("off")
 st=["Cantera y\nmateria prima","Horno de\nclínker","Molienda de\ncemento\n(+ adiciones)","Ensacado\n(saco 50 kg)","Despacho\nsaco / granel"]
@@ -72,11 +73,11 @@ for i,s in enumerate(st):
     hot=i==1
     ax.text(i*2,0,s,ha="center",va="center",fontsize=8.5,color="white" if hot else NAVY,fontweight="bold",bbox=dict(boxstyle="round,pad=.5",fc=RED if hot else "#E8ECF3",ec="none"))
     if i<len(st)-1: ax.annotate("",xy=(i*2+1.0,0),xytext=(i*2+.78,0),arrowprops=dict(arrowstyle="-|>",color=GRAY))
-ax.text(2,-.62,"Restricción (cuello de botella)",color=RED,ha="center",fontsize=8,style="italic")
+ax.text(2,-.62,"Etapa más cargada (cuello de botella)",color=RED,ha="center",fontsize=8,style="italic")
 ax.set_xlim(-1,9); ax.set_ylim(-.9,.7); fig.tight_layout(); fig.savefig("fig/f8_proceso.png"); plt.close()
 # 9 tablero (captura)
 from openpyxl import load_workbook
-wb=load_workbook("recalc/Proyecto_Argos_Modelo_y_Tablero.xlsx",data_only=True); tb=wb["Tablero"]
+wb=load_workbook("Proyecto_Argos_Modelo_y_Tablero.xlsx",data_only=True); tb=wb["Tablero"]
 meses=[tb.cell(row=r,column=1).value for r in range(7,19)]
 def col(c): return [tb.cell(row=r,column=c).value for r in range(7,19)]
 fig,axs=plt.subplots(2,2,figsize=(9,5))

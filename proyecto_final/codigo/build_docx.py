@@ -162,7 +162,7 @@ for cb, iv in ((0, 0.22), (20000, 0.22), (60000, 0.22), (20000, 0.12), (20000, 0
 for _ in range(4): para("", align="c")
 para("Consultoría simulada de producción inteligente: diagnóstico y plan de mejora del sistema de producción de cemento gris de Cementos Argos en Colombia", bold=True, align="c")
 para("", align="c")
-for ln in ("Natalia Aragón, Mary Barrera, Brandon Afanador y María Auxiliadora Salcedo Pérez",
+for ln in ("Brandon Afanador, Natalia Aragón, Mary Barrera y María Auxiliadora Salcedo Pérez",
            "Programa de Administración de Empresas, Universidad Sergio Arboleda, Barranquilla",
            "Prospectiva Tecnológica & Producción Inteligente",
            "Natasha Charris",
@@ -173,7 +173,7 @@ d.add_page_break()
 # =============================================================== TABLA DE CONTENIDO
 d.add_heading("Tabla de contenido", 1)
 TOC = ["Introducción y alcance", "Contextualización de la empresa", "Pronóstico de demanda", "Análisis de capacidad",
-       "Plan agregado", "Plan Maestro de Producción (MPS) y ATP", "Diagnóstico de restricción (TOC)", "Tablero de indicadores",
+       "Plan agregado", "Plan Maestro de Producción (MPS) y ATP", "Tablero de indicadores",
        "Recomendaciones", "Conclusiones", "Anexo A. Tabla consolidada de supuestos", "Referencias"]
 for t in TOC:
     p = d.add_paragraph(); p.paragraph_format.tab_stops.add_tab_stop(Cm(16.4), WD_TAB_ALIGNMENT.RIGHT, WD_TAB_LEADER.DOTS)
@@ -184,8 +184,8 @@ d.add_page_break()
 # =============================================================== 1 INTRO
 h1(TOC[0])
 para("Este documento presenta una consultoría simulada: nuestro equipo asume el papel de consultores externos que diagnostican el sistema de producción de **Cementos Argos en Colombia** y formulan recomendaciones sustentadas con las herramientas del curso. La empresa se eligió porque es un emisor público que reporta sus resultados, y porque el DANE publica cada mes los despachos nacionales de cemento gris, lo que permite apoyar el pronóstico en datos reales y no solo en supuestos.", align="j")
-para("**Alcance.** Se analiza una sola familia (cemento gris) en la operación colombiana, con un horizonte de planeación de 12 meses (diciembre de 2026 a noviembre de 2027). No se incluyen concreto, agregados ni operaciones fuera de Colombia. Se prefirió un análisis sencillo y coherente a uno complejo: una unidad de medida (toneladas), una restricción y un flujo de cálculo único.", align="j")
-para("**Cómo se conectan los componentes.** Un libro de Excel (anexo) concentra todos los supuestos en una sola hoja y el resto de los cálculos se alimenta de ella. El pronóstico fija la demanda; la demanda se compara con la capacidad por etapa; la capacidad y la demanda alimentan el plan agregado; el plan agregado se desagrega en el MPS; la etapa de mayor utilización se diagnostica con TOC; y el tablero mide lo que las secciones anteriores decidieron.", align="j")
+para("**Alcance.** Se analiza una sola familia (cemento gris) en la operación colombiana, con un horizonte de planeación de 12 meses (diciembre de 2026 a noviembre de 2027). No se incluyen concreto, agregados ni operaciones fuera de Colombia. Se prefirió un análisis sencillo y coherente a uno complejo: una unidad de medida (toneladas), una familia de producto y un flujo de cálculo único.", align="j")
+para("**Cómo se conectan los componentes.** Un libro de Excel (anexo) concentra todos los supuestos en una sola hoja y el resto de los cálculos se alimenta de ella. El pronóstico fija la demanda; la demanda se compara con la capacidad por etapa; la capacidad y la demanda alimentan el plan agregado; el plan agregado se desagrega en el MPS; y el tablero mide lo que las secciones anteriores decidieron.", align="j")
 fig("fig/f7_flujo.png", 12.5, "Figura 1. Flujo de coherencia entre los componentes del proyecto.")
 para("**Transparencia sobre los datos.** Distinguimos tres tipos de cifras:", after=2)
 bullets([
@@ -208,7 +208,7 @@ ctx = [["Despachos nacionales de cemento gris 2024 (kt)", f1(S["nac_2024"]), "DA
        ["Participación de mercado de Argos (calculada)", pc(S["share"]), "Calculada"]]
 table(["Indicador de contexto", "Valor", "Fuente"], ctx, [9.5, 3, 4], size=9, caption="Tabla 1. Cifras públicas que anclan el análisis.")
 para("**Problema de consultoría.** La demanda del cemento es estacional y crece cerca de 5 % al año, mientras que el horno, el activo más costoso y menos flexible, tiene una capacidad fija. La pregunta que guía el proyecto es: **¿cómo debe planear y programar Argos su producción de cemento gris en Colombia durante los próximos 12 meses para cumplir la demanda al menor costo, identificando y protegiendo la etapa que limita el sistema?** Cada componente responde una parte: cuánto se demandará, cuánto se puede producir, cómo repartir la producción en el tiempo, qué referencia programar semana a semana, dónde está el cuello de botella y cómo se medirá el resultado.", align="j")
-fig("fig/f8_proceso.png", 12.5, "Figura 2. Proceso productivo simplificado. En rojo, la etapa que el análisis de capacidad identifica como restricción.")
+fig("fig/f8_proceso.png", 12.5, "Figura 2. Proceso productivo simplificado. En rojo, la etapa que el análisis de capacidad identifica como la más cargada (cuello de botella).")
 para("**Proceso.** La materia prima (caliza y arcilla) se tritura y se cocina en el horno para producir clínker. El clínker se muela con yeso y adiciones para obtener cemento, que se empaca en sacos o se despacha a granel. Usar más adiciones reduce el contenido de clínker por tonelada (factor clínker), que es el insumo más intensivo en energía y emisiones. Por eso esta variable aparece más adelante como indicador de sostenibilidad (ESG).", align="j")
 
 # =============================================================== 3 PRONÓSTICO
@@ -238,7 +238,7 @@ para("**Definiciones.** Se usan las definiciones habituales de capacidad (Heizer
 fig("fig/f3_util.png", 12.5, "Figura 4. Utilización mensual de la capacidad efectiva por etapa. Sobre la línea roja la demanda excede la capacidad.")
 para(f"**Resultado.** El **horno** es la etapa con mayor utilización ({pc(M.UTIL_AVG['Horno (clínker)'])} en promedio) y la única que supera el 100 % en los meses pico ({', '.join(months_over)}, con un máximo de {pc(M.UTIL_MAX['Horno (clínker)'])}). La molienda y el ensacado tienen holgura. En términos de cemento, el sistema puede producir **{f1(M.CAP_CEM_REG)} kt/mes** con recursos regulares, limitado por el horno. Con recursos extra (compra de clínker, molienda adicional) se asume una capacidad máxima de {f1(M.CAP_CEM_EXT)} kt/mes (+8 %). Solo {f1(np.maximum(0, M.DEM - M.CAP_CEM_REG).sum())} kt de cemento (en dos o tres meses) exceden la capacidad regular.", align="j")
 para(f"**Estrategia de capacidad.** Recomendamos una estrategia de **ajuste (*match*) con mejoras incrementales**, y no adelantarse con una nueva línea de horno. La brecha en 2027 es pequeña y se concentra en pocos meses, de modo que no justifica una inversión grande; se cubre con inventario previo y con mejoras en el horno. El riesgo es el crecimiento: con 5 % anual, la demanda media alcanzaría la capacidad regular anual ({f0(cap_year)} kt) en aproximadamente {yrs:.1f} años después del horizonte, es decir, hacia 2029. Ese es el punto en que la decisión de capacidad debe replantearse con una evaluación financiera de inversión.", align="j")
-para("**Nota metodológica.** El resultado de que el horno sea la restricción depende de las capacidades supuestas. Es la configuración típica de una cementera (el horno es el activo más caro y menos flexible), pero debe confirmarse con datos internos o con una entrevista a la empresa en una consultoría real.", align="j", italic=True)
+para("**Nota metodológica.** El resultado de que el horno sea la etapa más cargada depende de las capacidades supuestas. Es la configuración típica de una cementera (el horno es el activo más caro y menos flexible), pero debe confirmarse con datos internos o con una entrevista a la empresa en una consultoría real.", align="j", italic=True)
 
 # =============================================================== 5 PLAN AGREGADO
 h1(TOC[4])
@@ -278,91 +278,67 @@ para("**Cálculos.** Se sigue la lógica estándar de la planeación maestra de 
 fig("fig/f5_mps.png", 12, "Figura 6. MPS, pedidos firmes e inventario proyectado de la referencia.")
 para(f"**Coherencia con el plan agregado.** La suma del MPS de cada mes es igual a la producción del plan agregado multiplicada por la participación de la referencia: {f0(P[0]*1000*M.REF_SHARE)} t en diciembre, enero y febrero (celda de control en el Excel). El ATP de la tercera semana es bajo ({f0(M.ATP[2])} t): casi toda la campaña de la semana 3 ya está comprometida, por lo que un pedido nuevo grande debería ofrecerse con la campaña de la semana 5, que tiene un ATP de {f0(M.ATP[4])} t.", align="j")
 
-# =============================================================== 7 TOC
-h1(TOC[6])
-para("**Paso 1: identificar la restricción.** Los pasos de la Teoría de Restricciones provienen de Goldratt y Cox (1984). El análisis de capacidad (véase Análisis de capacidad) identifica el **horno de clínker** como la restricción: es la etapa con mayor utilización media y la única que supera el 100 % en el pico. Conviene precisar su naturaleza. En los meses de demanda baja (diciembre a marzo) el plan produce por debajo de la capacidad, porque ahí la restricción es el mercado y no el horno; la restricción física solo se activa en los meses pico. Es, por tanto, una restricción **estacional**, y la política correcta es acumular inventario antes del pico, no operar el horno por debajo de su capacidad cuando ya se sabe que el pico llegará (esto es lo que hace la estrategia mixta a partir de abril).", align="j")
-fig("fig/f6_toc.png", 12.5, "Figura 7. Trúput por tonelada de clínker según producto (izquierda) y clínker requerido frente a la capacidad del horno (derecha).")
-cl = []
-for i in range(12):
-    cl.append([mes(M.PLAN_LABEL[i]), f1(M.CLK_REQ[i]), f1(M.CLK_CAP), pc(M.CLK_REQ[i]/M.CLK_CAP), f1(max(0, M.CLK_REQ[i]-M.CLK_CAP))])
-table(["Mes", "Clínker requerido (kt)", "Capacidad efectiva del horno (kt)", "Utilización", "Déficit (kt)"], cl, [2.2, 3.6, 4.6, 2.8, 2.8], size=8.5, caption="Tabla 9. Clínker requerido por la mezcla de productos frente a la capacidad efectiva del horno.")
-para("El requerimiento de clínker se calcula con el factor ponderado de la mezcla (0,746 t/t), coherente con el factor de 0,75 usado en el análisis de capacidad. Solo dos meses superan el 100 %: el déficit total es pequeño, pero ocurre cuando la demanda es máxima y el costo de no cumplir es el ingreso completo de cada tonelada.", align="j")
-para("**Paso 2: explotar la restricción.** Explotar significa sacar el máximo de la restricción sin inversión grande. Proponemos dos acciones, ambas con base en el modelo:", after=2)
-tabla = []
-for p in M.TOC:
-    tabla.append([p, pc(M.TOC[p]["share"], 0), f0(M.TOC[p]["T"]), f"{S['fclk_prod'][p]:.2f}".replace(".", ","), f0(M.TOC[p]["T_clk"])])
-table(["Producto", "Mezcla", "Trúput T (COP/t)", "Factor clínker", "T por t de clínker (COP)"], tabla, [4, 2.2, 3.2, 2.8, 4], size=9, caption="Tabla 10. Trúput (precio menos costo totalmente variable) por tonelada y por tonelada de clínker.")
-bullets([
- f"**Priorizar el producto con mayor trúput por unidad de restricción.** Aunque el estructural deja más trúput por tonelada de cemento (245.000 COP frente a 230.000 del UG), consume más clínker (0,85 frente a 0,72 t/t), por lo que el **UG en saco** genera más por tonelada de clínker (319.444 COP) y el granel menos (236.111 COP). En los meses en que el clínker no alcanza ({', '.join(months_over)}; déficit total de {f1(clk_def)} kt), debe asignarse primero al UG. Asignar ese clínker a UG en lugar de a granel vale aproximadamente **{f0(val_mix)} millones de COP**.",
- f"**Proteger la disponibilidad del horno.** Cada punto porcentual de disponibilidad equivale a unos {f1(M.C['horno_dis_mes']*0.01*12/S['factor_clinker'])} kt de cemento al año. Subir la disponibilidad de 88 % a 90 % (+2 pp) con mantenimiento predictivo (sensores de vibración y temperatura y analítica de datos, ejes de la Industria 4.0) libera unas {f0(M.cem_extra_anual)} kt de cemento al año y reduce el costo del plan en {f0(esc_disp)} millones de COP al recalcular el plan agregado.",
-])
-para("Los pasos 3 a 5 de TOC (subordinar, elevar y repetir) no se desarrollan, porque la guía del proyecto exige al menos los dos primeros. El paso 3 queda en cierto modo anticipado en el plan: molienda y ensacado se programan al ritmo del horno, y no al revés.", align="j")
-
 # =============================================================== 8 TABLERO
-h1(TOC[7])
+h1(TOC[6])
 para("El tablero (anexo en Excel: hoja 'Tablero') contiene cinco indicadores, cada uno derivado de una sección anterior, con metas y umbrales de semáforo. Los valores 'reales' de los 12 meses son **simulados**: se generaron como el plan o pronóstico multiplicado por una variación aleatoria con semilla fija (desviaciones de 3,5 % en la demanda, 2 % en la producción y 1,2 puntos en la disponibilidad). El tablero incluye un selector de mes (celda amarilla) que actualiza los valores y el semáforo.", align="j")
 ind = [
  ["MAPE del pronóstico", "≤ 5 %", "≤ 8 %", "Pronóstico", pc(kpi["MAPE del pronóstico"][0]), kpi["MAPE del pronóstico"][1]],
- ["Utilización del horno (restricción)", "85–100 %", "80–100 %", "Capacidad y TOC", pc(kpi["Utilización del horno (restricción)"][0]), kpi["Utilización del horno (restricción)"][1]],
+ ["Utilización del horno", "85–100 %", "80–100 %", "Capacidad", pc(kpi["Utilización del horno"][0]), kpi["Utilización del horno"][1]],
  ["Cumplimiento del MPS (producido / plan)", "≥ 97 %", "≥ 93 %", "Plan agregado y MPS", pc(kpi["Cumplimiento del MPS"][0]), kpi["Cumplimiento del MPS"][1]],
  ["Fill rate (nivel de servicio)", "≥ 98 %", "≥ 95 %", "MPS", pc(kpi["Fill rate (nivel de servicio)"][0]), kpi["Fill rate (nivel de servicio)"][1]],
- ["Factor clínker (ESG)", "≤ 0,74", "≤ 0,75", "Contexto y TOC", f"{kpi['Factor clínker (ESG)'][0]:.3f}".replace(".", ","), kpi["Factor clínker (ESG)"][1]],
+ ["Factor clínker (ESG)", "≤ 0,74", "≤ 0,75", "Contexto y capacidad", f"{kpi['Factor clínker (ESG)'][0]:.3f}".replace(".", ","), kpi["Factor clínker (ESG)"][1]],
 ]
-table(["Indicador", "Meta (verde)", "Amarillo", "Origen", "Promedio simulado", "Estado"], ind, [5.2, 2.2, 2.2, 2.8, 2.6, 2], size=8.5, caption="Tabla 11. Indicadores, metas y resultado simulado (promedio de 12 meses).")
-fig("fig/f9_tablero.png", 12.5, "Figura 8. Evolución de los cinco indicadores en los 12 meses simulados (líneas verdes: metas).")
+table(["Indicador", "Meta (verde)", "Amarillo", "Origen", "Promedio simulado", "Estado"], ind, [5.2, 2.2, 2.2, 2.8, 2.6, 2], size=8.5, caption="Tabla 9. Indicadores, metas y resultado simulado (promedio de 12 meses).")
+fig("fig/f9_tablero.png", 12.5, "Figura 7. Evolución de los cinco indicadores en los 12 meses simulados (líneas verdes: metas).")
 para("**Justificación de las metas.** El MAPE de 5 % es exigente pero coherente con el error de la ventana de evaluación. La utilización mínima de 85 % refleja que el plan produce por debajo de la capacidad en los meses de baja demanda; superar 100 % indica sobreutilización y riesgo de paros no programados. El factor clínker de 0,74 es una meta de reducción gradual frente a la base de 0,75, y es el indicador ESG: bajarlo reduce emisiones de CO₂ y libera capacidad del horno.", align="j")
 
 # =============================================================== 9 RECOMENDACIONES
-h1(TOC[8])
+h1(TOC[7])
 para("Las recomendaciones se priorizan por su valor financiero estimado con el modelo y por su efecto en sostenibilidad. Cada una indica el hallazgo del que sale, la acción y el indicador de seguimiento. Los valores no son aditivos (los escenarios se evalúan por separado sobre el mismo plan) y no incluyen el costo de implementarlas, que no fue estimado por falta de datos.", align="j")
 rec = [
  ["1", "Adoptar el plan agregado mixto", f"Plan agregado: es la estrategia de menor costo y no requiere comprar clínker.", f"Producir {f1(P[0])} kt/mes hasta marzo y {f1(P[4])} kt/mes de abril a noviembre, acumulando inventario previo al pico.", f"{f0(ahorro_AC)} (vs. nivelación) y {f0(ahorro_BC)} (vs. persecución)", "Cumplimiento MPS; fill rate"],
- ["2", "Reducir el factor clínker de 0,75 a 0,72 (ESG)", f"Capacidad y TOC: el horno es la restricción y el clínker es el insumo escaso y de mayores emisiones.", f"Aumentar el uso de adiciones, verificando que los productos cumplan sus normas técnicas.", f"{f0(esc_fc)} en el plan; {f0(M.lib_clk)} kt de clínker y unas {f0(M.CO2_AHORRO)} kt de CO₂ evitados al año", "Factor clínker"],
- ["3", "Explotar el horno: +2 pp de disponibilidad", "TOC: la restricción física se activa en el pico.", "Mantenimiento predictivo con sensores y analítica; programar los paros anuales en los meses de menor demanda (dic–mar).", f"{f0(esc_disp)} en el plan; {f0(M.cem_extra_anual)} kt/año de capacidad", "Utilización y disponibilidad del horno"],
- ["4", "Asignar el clínker escaso al producto de mayor trúput por t de clínker", "TOC: UG saco genera 319.444 COP por t de clínker frente a 236.111 del granel.", f"En los meses con déficit de clínker ({', '.join(months_over)}), priorizar UG y estructural sobre el granel.", f"{f0(val_mix)} frente a asignarlo a granel", "Trúput por t de clínker; fill rate por producto"],
+ ["2", "Reducir el factor clínker de 0,75 a 0,72 (ESG)", f"Capacidad: el horno es la etapa más cargada y el clínker es su insumo escaso y de mayores emisiones.", f"Aumentar el uso de adiciones, verificando que los productos cumplan sus normas técnicas.", f"{f0(esc_fc)} en el plan; {f0(M.lib_clk)} kt de clínker y unas {f0(M.CO2_AHORRO)} kt de CO₂ evitados al año", "Factor clínker"],
+ ["3", "Aumentar la disponibilidad del horno en 2 puntos porcentuales", "Capacidad: el horno supera el 100 % de utilización en el pico.", "Mantenimiento predictivo con sensores y analítica; programar los paros anuales en los meses de menor demanda (dic–mar).", f"{f0(esc_disp)} en el plan; {f0(M.cem_extra_anual)} kt/año de capacidad", "Utilización y disponibilidad del horno"],
 ]
-table(["N.º", "Recomendación", "Hallazgo", "Acción", "Impacto estimado (MM COP)", "Indicador"], rec, [0.8, 3.2, 3.6, 4.2, 3.2, 2.2], size=8, caption="Tabla 12. Recomendaciones priorizadas.")
-para("**Industria 4.0/5.0 y sostenibilidad.** Las recomendaciones 2 y 3 son las que conectan con el enfoque del curso. El mantenimiento predictivo del horno (sensores de vibración, temperatura y consumo energético, con analítica de datos) es una aplicación directa de la Industria 4.0: reemplaza paros no programados por intervenciones planeadas, lo que mueve la disponibilidad hacia la meta. La reducción del factor clínker es la palanca ESG con efecto operativo: cada tonelada de clínker evitada reduce el consumo de combustible y las emisiones de proceso, y libera tiempo de horno que es, precisamente, el recurso restringido. El enfoque 5.0 se refleja en que las decisiones se apoyan en el criterio del equipo de planeación (por ejemplo, la priorización de productos en el pico) con datos del tablero, y no se delegan a un algoritmo opaco.", align="j")
-para("**Criterio de priorización.** La recomendación 1 es la de mayor valor y la más inmediata (es una decisión de programación, sin inversión). La 2 combina ahorro y beneficio ESG, pero requiere validar normas y aceptación del mercado. La 3 requiere inversión en sensores, cuyo retorno debe evaluarse. La 4 es de bajo costo y se aplica solo en los meses pico.", align="j")
+table(["N.º", "Recomendación", "Hallazgo", "Acción", "Impacto estimado (MM COP)", "Indicador"], rec, [0.8, 3.2, 3.6, 4.2, 3.2, 2.2], size=8, caption="Tabla 10. Recomendaciones priorizadas.")
+para("**Industria 4.0/5.0 y sostenibilidad.** Las recomendaciones 2 y 3 son las que conectan con el enfoque del curso. El mantenimiento predictivo del horno (sensores de vibración, temperatura y consumo energético, con analítica de datos) es una aplicación directa de la Industria 4.0: reemplaza paros no programados por intervenciones planeadas, lo que mueve la disponibilidad hacia la meta. La reducción del factor clínker es la palanca ESG con efecto operativo: cada tonelada de clínker evitada reduce el consumo de combustible y las emisiones de proceso, y libera tiempo de horno, que es la etapa más cargada. El enfoque 5.0 se refleja en que las decisiones se apoyan en el criterio del equipo de planeación (por ejemplo, el ajuste del plan cuando cambia el pronóstico) con datos del tablero, y no se delegan a un algoritmo opaco.", align="j")
+para("**Criterio de priorización.** La recomendación 1 es la de mayor valor y la más inmediata (es una decisión de programación, sin inversión). La 2 combina ahorro y beneficio ESG, pero requiere validar normas y aceptación del mercado. La 3 requiere inversión en sensores, cuyo retorno debe evaluarse.", align="j")
 imp = [
  ["Diciembre de 2026", "Aprobar el plan mixto y fijar la producción de dic–mar (404,0 kt/mes)", "Planeación de operaciones", "Cumplimiento MPS"],
  ["Dic. 2026 – mar. 2027", "Programar el paro anual del horno en el mes de menor demanda; iniciar piloto de mantenimiento predictivo", "Mantenimiento", "Disponibilidad del horno"],
- ["Abril de 2027", "Subir producción a 488,0 kt/mes y activar la regla de asignación de clínker por trúput", "Planeación y comercial", "Fill rate; utilización del horno"],
+ ["Abril de 2027", "Subir producción a 488,0 kt/mes para acumular inventario previo al pico", "Planeación y comercial", "Fill rate; utilización del horno"],
  ["Abril – septiembre 2027", "Pruebas de adiciones para llevar el factor clínker de 0,75 a 0,72", "Calidad y producción", "Factor clínker"],
  ["Octubre – noviembre 2027", "Operar el pico con el inventario acumulado; medir el resultado frente al modelo", "Planeación", "Todos los indicadores"],
 ]
-table(["Cuándo", "Acción", "Responsable (rol)", "Indicador"], imp, [3.2, 7.2, 3.2, 3.2], size=8.5, caption="Tabla 13. Hoja de ruta de implementación (horizonte dic-26 a nov-27).")
+table(["Cuándo", "Acción", "Responsable (rol)", "Indicador"], imp, [3.2, 7.2, 3.2, 3.2], size=8.5, caption="Tabla 11. Hoja de ruta de implementación (horizonte dic-26 a nov-27).")
 rk = [
  ["La demanda real supera el pronóstico en el pico", "El inventario no alcanza y aparecen faltantes", "Revisar el pronóstico cada mes (MAPE y señal de rastreo); activar compra de clínker (sobrecosto de 60.000 COP/t)"],
- ["La disponibilidad del horno es menor a 88 %", "Se pierde la capacidad del pico", "Reforzar el inventario previo; priorizar productos por trúput"],
+ ["La disponibilidad del horno es menor a 88 %", "Se pierde la capacidad del pico", "Reforzar el inventario previo y activar la compra de clínker en el pico"],
  ["Las adiciones no cumplen la norma o la aceptación del mercado", "No se logra el factor clínker de 0,72", "Pilotear por producto y por planta antes de generalizar"],
- ["Los supuestos de capacidad y costos difieren de la realidad", "Cambia el ranking de estrategias o la restricción", "Reemplazar los supuestos del Excel por datos internos y recalcular"],
+ ["Los supuestos de capacidad y costos difieren de la realidad", "Cambia el ranking de estrategias o la etapa más cargada", "Reemplazar los supuestos del Excel por datos internos y recalcular"],
 ]
-table(["Riesgo", "Consecuencia", "Respuesta"], rk, [5.5, 4.5, 7], size=8.5, caption="Tabla 14. Riesgos principales y respuesta.")
+table(["Riesgo", "Consecuencia", "Respuesta"], rk, [5.5, 4.5, 7], size=8.5, caption="Tabla 12. Riesgos principales y respuesta.")
 para("**Limitaciones.** (i) La serie mensual histórica está reconstruida y debe sustituirse por la oficial del DANE; (ii) las capacidades, precios y costos son supuestos; (iii) la participación de mercado se asume constante; (iv) no se evaluó el costo de implementar las recomendaciones; (v) los datos del tablero son simulados.", align="j")
 
 # =============================================================== 10 CONCLUSIONES
-h1(TOC[9])
+h1(TOC[8])
 bullets([
  f"La demanda de Argos Colombia crecería cerca de 5 % anual y suma {f0(DEMs)} kt en el horizonte; Holt-Winters fue el método más preciso (MAPE {pc(M.MEJOR[2]/100)} en la ventana de evaluación), con la salvedad de que la serie es corta y reconstruida.",
- f"El horno de clínker es la restricción del sistema ({pc(M.UTIL_AVG['Horno (clínker)'])} de utilización media, con picos sobre 100 %), pero es una restricción estacional: en los meses de baja demanda el límite es el mercado.",
+ f"El horno de clínker es la etapa más cargada ({pc(M.UTIL_AVG['Horno (clínker)'])} de utilización media) y la única que supera el 100 % en los meses pico; en los meses de baja demanda el límite es el mercado.",
  f"Una estrategia mixta de dos niveles de producción minimiza el costo ({mm(Cc['total'])} millones de COP), cumple el 100 % de la demanda y evita comprar clínker; el ahorro frente a las alternativas es de {f0(ahorro_BC)} a {f0(ahorro_AC)} millones de COP.",
  "El MPS de la referencia UG en saco es coherente con el plan agregado y el ATP muestra cuánta capacidad queda para nuevos pedidos en cada campaña.",
- "El diagnóstico TOC convierte la restricción en decisiones concretas: priorizar el producto de mayor trúput por tonelada de clínker y proteger la disponibilidad del horno.",
- "Reducir el factor clínker conecta sostenibilidad y productividad: libera capacidad en la restricción y reduce emisiones.",
+ "Reducir el factor clínker conecta sostenibilidad y productividad: libera capacidad en el horno y reduce emisiones.",
  "Antes de usar estos resultados en una decisión real, se deben reemplazar los supuestos por datos internos de la empresa; el modelo de Excel permite hacerlo sin rehacer los cálculos.",
 ])
 
 # =============================================================== ANEXO A
-h1(TOC[10], newpage=True)
+h1(TOC[9], newpage=True)
 sup = [
  ["Despachos nacionales 2024 / 2025", "12.109,6 / 12.708,0 kt", "Dato DANE", "Sí"], ["Acumulado ene–jul 2026; jun; sep", "7.555,2; 1.061,6; 1.194,4 kt", "Dato DANE", "Sí"],
  ["Cemento Argos Colombia 2025", "5.000 kt", "Grupo Argos (2026)", "Sí"], ["Participación de mercado", pc(S["share"]), "Calculada", "Sí"],
  ["Capacidad de diseño del horno", "5.000 kt clínker/año", "Supuesto", "Sí"], ["Disponibilidad del horno", "88 %", "Supuesto (rango 85–90 %)", "Sí"],
  ["Factor clínker", "0,75 t/t (0,746 ponderado)", "Supuesto", "Sí"], ["Capacidad de molienda / eficiencia", "6.800 kt/año / 90 %", "Supuesto", "Sí"],
- ["Capacidad de ensacado / eficiencia", "4.800 kt/año / 85 %", "Supuesto", "Declarar"], ["Mezcla UG / estructural / granel", "45 % / 20 % / 35 %", "Supuesto", "Declarar"],
- ["Precio y costo variable promedio", "560.000 / 330.000 COP/t", "Supuesto", "Sí"], ["Precio / costo variable UG", "560.000 / 330.000 COP/t", "Supuesto", "Declarar"],
- ["Precio / costo variable estructural", "600.000 / 355.000 COP/t", "Supuesto", "Declarar"], ["Precio / costo variable granel", "470.000 / 300.000 COP/t", "Supuesto", "Declarar"],
+ ["Capacidad de ensacado / eficiencia", "4.800 kt/año / 85 %", "Supuesto", "Declarar"], ["Mezcla UG / estructural / granel", "45 % / 20 % / 35 %", "Supuesto", "Declarar"], ["Precio y costo variable promedio", "560.000 / 330.000 COP/t", "Supuesto", "Sí"],
  ["Costo de mantener inventario", "22 % anual sobre 400.000 COP/t", "Supuesto (rango 20–25 %)", "No"], ["Sobrecosto sobre capacidad regular", "60.000 COP/t", "Supuesto", "Declarar"],
  ["Costo de cambiar el ritmo", "20.000 COP/t de cambio", "Supuesto", "Declarar"], ["Capacidad extra / inventario inicial", "+8 % / 150 kt", "Supuesto", "Declarar"],
  ["Vida útil del cemento en saco", "1,5 meses de demanda", "Supuesto", "Sí"], ["t CO₂ por t de clínker", "0,85", "Referencia sectorial", "Sí"],
@@ -372,11 +348,10 @@ sup = [
 table(["Supuesto o dato", "Valor", "Tipo / fuente", "Verificar"], sup, [5.8, 4.8, 4.2, 2.6], size=8.5, caption="Tabla A1. Supuestos consolidados (la columna 'Verificar' indica qué debe contrastarse con fuentes antes de la entrega).")
 
 # =============================================================== REFERENCIAS
-h1(TOC[11], newpage=True)
+h1(TOC[10], newpage=True)
 refs = [
  "Argos. (2025). *Reporte integrado Cementos Argos 2024*. https://files.grupoargos.com/uploads-grupo-argos/2025/03/Reporte-Integrado-cementos-argos-2024.pdf",
  "Departamento Administrativo Nacional de Estadística. (2026). *Estadísticas de cemento gris (ECG): boletines técnicos de diciembre de 2025, julio de 2026 y septiembre de 2026*. https://www.dane.gov.co/index.php/en/statistics-by-topic-1/construction/estadisticas-de-cemento-gris",
- "Goldratt, E. M., & Cox, J. (1984). *The goal: A process of ongoing improvement*. North River Press.",
  "Grupo Argos. (2026). *Informe de gestión Grupo Argos 2025*. https://files.grupoargos.com/uploads-grupo-argos/2026/03/InformeGestion_GrupoArgos_2025.pdf",
  "Heizer, J., Render, B., & Munson, C. (2020). *Operations management: Sustainability and supply chain management* (13.ª ed.). Pearson.",
  "Hyndman, R. J., & Athanasopoulos, G. (2021). *Forecasting: Principles and practice* (3.ª ed.). OTexts. https://otexts.com/fpp3/",

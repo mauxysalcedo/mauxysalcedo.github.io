@@ -1,4 +1,6 @@
 import numpy as np
+import os
+os.chdir("/home/user/mauxysalcedo.github.io/proyecto_final")
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter as L
@@ -29,9 +31,9 @@ def title(ws, t, sub=None):
 
 # ------------------------------------------------------------ LÉAME
 ws = wb.active; ws.title = "Leame"
-title(ws, "Proyecto Final - Cementos Argos (cemento gris, Colombia)", "Consultoría simulada · Prospectiva Tecnológica & Producción Inteligente · Universidad Sergio Arboleda Barranquilla")
+title(ws, "Proyecto Final - Cementos Argos (cemento gris, Colombia)", "Consultoría simulada · Prospectiva Tecnológica & Producción Inteligente · Universidad Sergio Arboleda Barranquilla · Equipo: Brandon Afanador, Natalia Aragón, Mary Barrera y María Auxiliadora Salcedo Pérez")
 lines = [
- "Este libro contiene todos los cálculos del proyecto. Flujo: Supuestos → Historico → Pronostico → Capacidad → Agregado → MPS → TOC → Tablero.",
+ "Este libro contiene todos los cálculos del proyecto. Flujo: Supuestos → Historico → Pronostico → Capacidad → Agregado → MPS → Tablero.",
  "Convención de color: AZUL = dato de entrada o supuesto (editable). NEGRO = fórmula. Cambie un supuesto en la hoja 'Supuestos' y todo se recalcula.",
  "Unidades: miles de toneladas (kt) de cemento por mes, salvo que se indique otra cosa. Dinero en pesos colombianos (COP).",
  "IMPORTANTE: la serie mensual histórica es RECONSTRUIDA (calibrada con totales anuales y puntos mensuales públicos del DANE) porque no fue posible descargar la serie mensual oficial. Reemplace la columna azul de 'Historico' con la serie oficial ECG del DANE y el modelo se actualiza.",
@@ -70,15 +72,6 @@ rows = [
  ("Mezcla: Uso General en saco", "mix_ug", S["mix"]["UG saco"], "%", "SUPUESTO", "Referencia clave del MPS", "Declarar"),
  ("Mezcla: Estructural en saco", "mix_est", S["mix"]["Estructural saco"], "%", "SUPUESTO", "", "Declarar"),
  ("Mezcla: Granel", "mix_gr", S["mix"]["Granel"], "%", "SUPUESTO", "Concreteras y obras grandes", "Declarar"),
- ("Precio UG saco", "p_ug", S["precio_prod"]["UG saco"], "COP/t", "SUPUESTO", "", "Declarar"),
- ("Precio Estructural saco", "p_est", S["precio_prod"]["Estructural saco"], "COP/t", "SUPUESTO", "", "Declarar"),
- ("Precio Granel", "p_gr", S["precio_prod"]["Granel"], "COP/t", "SUPUESTO", "", "Declarar"),
- ("Costo variable UG saco", "c_ug", S["cvar_prod"]["UG saco"], "COP/t", "SUPUESTO", "", "Declarar"),
- ("Costo variable Estructural saco", "c_est", S["cvar_prod"]["Estructural saco"], "COP/t", "SUPUESTO", "", "Declarar"),
- ("Costo variable Granel", "c_gr", S["cvar_prod"]["Granel"], "COP/t", "SUPUESTO", "", "Declarar"),
- ("Factor clínker UG", "f_ug", S["fclk_prod"]["UG saco"], "t/t", "SUPUESTO", "Con adiciones", "Declarar"),
- ("Factor clínker Estructural", "f_est", S["fclk_prod"]["Estructural saco"], "t/t", "SUPUESTO", "Mayor contenido de clínker", "Declarar"),
- ("Factor clínker Granel", "f_gr", S["fclk_prod"]["Granel"], "t/t", "SUPUESTO", "", "Declarar"),
  ("Mejora de disponibilidad del horno (explotar)", "dpp", M.EXPL_PP, "pp", "Escenario", "Recomendación 2", "No"),
  ("Factor clínker objetivo (ESG)", "fclk_n", M.FC_NEW, "t/t", "Escenario", "Recomendación 4", "No"),
  ("t CO2 por t de clínker", "co2", M.CO2_CLK, "t/t", "Referencia", "Valor de referencia sectorial", "Sí"),
@@ -176,7 +169,7 @@ for k, (nm, dis, ef, req) in enumerate(etapas):
     cp.cell(row=r, column=9, value=f"=G{r}/E{r}").number_format = "0.0%"; cp.cell(row=r, column=10, value=f"=H{r}/E{r}").number_format = "0.0%"
     cp.cell(row=r, column=11, value=f"=E{r}/F{r}")
     for c in (2, 3, 5, 6, 7, 8, 11): cp.cell(row=r, column=c).number_format = "#,##0.0"
-cp["A8"] = "Restricción del sistema (mayor utilización media):"; cp["A8"].font = BOLD
+cp["A8"] = "Etapa más cargada (mayor utilización media):"; cp["A8"].font = BOLD
 cp["E8"] = "=INDEX(A4:A6,MATCH(MAX(I4:I6),I4:I6,0))"
 cp["A9"] = "Capacidad regular de cemento del sistema (kt/mes) = mínimo de la columna K:"; cp["E9"] = "=MIN(K4:K6)"; cp["E9"].number_format = "0.0"
 cp["A10"] = "Capacidad con recursos extra (kt/mes):"; cp["E10"] = f"=E9*(1+{R['extra_cap']})"; cp["E10"].number_format = "0.0"
@@ -296,43 +289,11 @@ widths(mp, [14, 10, 20, 24, 18, 16, 14])
 lc = LineChart(); lc.title = "Inventario proyectado (t)"; lc.height = 7; lc.width = 14
 lc.add_data(Reference(mp, min_col=6, min_row=6, max_row=18), titles_from_data=True); lc.set_categories(Reference(mp, min_col=1, min_row=7, max_row=18)); mp.add_chart(lc, "I6")
 
-# ------------------------------------------------------------ TOC
-tc = wb.create_sheet("TOC"); title(tc, "Diagnóstico de restricción (TOC): pasos 1 y 2", "Identificar la restricción y explotarla. Trúput (T) = precio - costo totalmente variable.")
-tc["A3"] = "Paso 1 - Identificar: restricción del sistema (Capacidad):"; tc["A3"].font = BOLD; tc["E3"] = "=Capacidad!E8"
-hdr(tc, 5, ["Producto", "Mezcla", "Precio", "Costo variable", "Trúput T (COP/t)", "Factor clínker", "T por t de clínker", "Prioridad"])
-prods = [("UG saco", "mix_ug", "p_ug", "c_ug", "f_ug"), ("Estructural saco", "mix_est", "p_est", "c_est", "f_est"), ("Granel", "mix_gr", "p_gr", "c_gr", "f_gr")]
-for k, (nm, mx, pp, cc, ff) in enumerate(prods):
-    r = 6 + k
-    tc.cell(row=r, column=1, value=nm); tc.cell(row=r, column=2, value=f"={R[mx]}").number_format = "0%"
-    tc.cell(row=r, column=3, value=f"={R[pp]}").number_format = "#,##0"; tc.cell(row=r, column=4, value=f"={R[cc]}").number_format = "#,##0"
-    tc.cell(row=r, column=5, value=f"=C{r}-D{r}").number_format = "#,##0"; tc.cell(row=r, column=6, value=f"={R[ff]}")
-    tc.cell(row=r, column=7, value=f"=E{r}/F{r}").number_format = "#,##0"; tc.cell(row=r, column=8, value=f"=RANK(G{r},$G$6:$G$8)")
-tc["A9"] = "Factor clínker ponderado (debe ≈ factor del sistema):"; tc["F9"] = "=SUMPRODUCT(B6:B8,F6:F8)"; tc["F9"].number_format = "0.000"
-tc["A10"] = "Trúput medio ponderado (COP/t):"; tc["E10"] = "=SUMPRODUCT(B6:B8,E6:E8)"; tc["E10"].number_format = "#,##0"
-tc["A12"] = "Paso 2 - Explotar: requerimiento de clínker vs capacidad del horno"; tc["A12"].font = BOLD
-hdr(tc, 13, ["Mes", "Demanda (kt cem.)", "Clínker requerido (kt)", "Capacidad horno efectiva (kt)", "Utilización", "Déficit de clínker (kt)", "Cap. con +2 pp disp. (kt)", "Déficit con +2 pp (kt)"])
-for j in range(12):
-    r = 14 + j
-    tc.cell(row=r, column=1, value=f"=Pronostico!A{PLAN0+j}").number_format = "mmm-yy"
-    tc.cell(row=r, column=2, value=f"=Pronostico!E{PLAN0+j}").number_format = "0.0"
-    tc.cell(row=r, column=3, value=f"=B{r}*$F$9").number_format = "0.0"
-    tc.cell(row=r, column=4, value="=Capacidad!$E$4").number_format = "0.0"
-    tc.cell(row=r, column=5, value=f"=C{r}/D{r}").number_format = "0.0%"
-    tc.cell(row=r, column=6, value=f"=MAX(0,C{r}-D{r})").number_format = "0.0"
-    tc.cell(row=r, column=7, value=f"=Capacidad!$C$4*({R['disp']}+{R['dpp']})").number_format = "0.0"
-    tc.cell(row=r, column=8, value=f"=MAX(0,C{r}-G{r})").number_format = "0.0"
-tc["A26"] = "Total"; tc["A26"].font = BOLD
-for c in (2, 3, 6, 8): tc.cell(row=26, column=c, value=f"=SUM({L(c)}14:{L(c)}25)").number_format = "#,##0.0"
-tc.conditional_formatting.add("E14:E25", CellIsRule(operator="greaterThan", formula=["1"], fill=RED))
-tc["A28"] = "Valor de usar el clínker escaso en el producto de mayor T/t clínker"; tc["A28"].font = BOLD
-tc["A29"] = "Clínker en déficit en meses pico (kt):"; tc["E29"] = "=F26"
-tc["A30"] = "Diferencia de T por t de clínker: UG saco vs Granel (COP):"; tc["E30"] = "=G6-G8"; tc["E30"].number_format = "#,##0"
-tc["A31"] = "Valor si el clínker escaso se asigna a UG en lugar de a granel (MM COP):"; tc["E31"] = "=E29*1000*E30/1000000"; tc["E31"].number_format = "#,##0"
-tc["A33"] = "Escenarios de explotación y ESG (resultados del modelo del Plan agregado)"; tc["A33"].font = BOLD
-tc["A34"] = "Cemento adicional anual por +2 pp de disponibilidad (kt):"; tc["E34"] = f"=Capacidad!C4*{R['dpp']}*12/{R['fclk']}"; tc["E34"].number_format = "#,##0.0"
-tc["A35"] = "Clínker liberado por bajar el factor a 0,72 (kt/año):"; tc["E35"] = f"=SUM(Pronostico!E{PLAN0}:E{PLAN0+11})*({R['fclk']}-{R['fclk_n']})"; tc["E35"].number_format = "#,##0.0"
-tc["A36"] = "CO2 evitado (kt/año):"; tc["E36"] = f"=E35*{R['co2']}"; tc["E36"].number_format = "#,##0.0"
-widths(tc, [58, 16, 18, 22, 18, 20, 22, 20])
+# ------------------------------------------------------------ ESCENARIOS (en la hoja Capacidad)
+cp["A28"] = "Escenarios de mejora (respaldan las recomendaciones)"; cp["A28"].font = BOLD
+cp["A29"] = "Cemento adicional anual por +2 pp de disponibilidad del horno (kt):"; cp["E29"] = f"=C4*{R['dpp']}*12/{R['fclk']}"; cp["E29"].number_format = "#,##0.0"
+cp["A30"] = "Clínker liberado por bajar el factor clínker a 0,72 (kt/año):"; cp["E30"] = f"=SUM(Pronostico!E{PLAN0}:E{PLAN0+11})*({R['fclk']}-{R['fclk_n']})"; cp["E30"].number_format = "#,##0.0"
+cp["A31"] = "CO2 evitado (kt/año):"; cp["E31"] = f"=E30*{R['co2']}"; cp["E31"].number_format = "#,##0.0"
 
 # ------------------------------------------------------------ TABLERO
 tb = wb.create_sheet("Tablero"); title(tb, "Tablero de indicadores - Cementos Argos Colombia", "Valores 'reales' SIMULADOS (plan ± variación aleatoria con semilla fija) para demostrar el funcionamiento. Seleccione el mes en la celda amarilla.")
@@ -368,10 +329,10 @@ tb["B3"].value = "=A7"
 hdr(tb, 21, ["Indicador", "Valor (mes)", "Promedio 12 m", "Meta", "Umbral amarillo", "Estado", "Sección origen"])
 kpis = [
  ("MAPE del pronóstico", "J", "<=", 0.05, 0.08, "0.0%", "C2 Pronóstico"),
- ("Utilización del horno (restricción)", "K", "band", 0.85, 0.80, "0.0%", "C3 / C6"),
+ ("Utilización del horno", "K", "band", 0.85, 0.80, "0.0%", "C3 Capacidad"),
  ("Cumplimiento del MPS", "L", ">=", 0.97, 0.93, "0.0%", "C4 / C5"),
  ("Fill rate (nivel de servicio)", "M", ">=", 0.98, 0.95, "0.0%", "C5"),
- ("Factor clínker (ESG)", "N", "<=", 0.74, 0.75, "0.000", "C6 / ESG"),
+ ("Factor clínker (ESG)", "N", "<=", 0.74, 0.75, "0.000", "ESG"),
 ]
 for k, (nm, col, op, meta, amb, fmt, src) in enumerate(kpis):
     r = 22 + k
