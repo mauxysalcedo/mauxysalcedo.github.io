@@ -7,8 +7,8 @@ from datetime import date
 # ------------------------------------------------------------------ SUPUESTOS
 SUP = dict(
     # --- datos públicos (verificar) ---
-    nac_2024=12109.6, nac_2025=12708.0,     # DANE ECG, miles t despachos nacionales
-    nac_ene_jul_2026=7555.2, nac_jun_2026=1061.6, nac_sep_2026=1194.4,
+    nac_2024=12247.2, nac_2025=12911.2,     # DANE ECG, miles t despachos nacionales
+    nac_ene_jul_2026=7555.3, nac_jun_2026=1061.6, nac_sep_2026=1194.4,
     argos_col_2025=5000.0,                  # miles t cemento regional Colombia (Informe de Gestión Grupo Argos 2025)
     # --- supuestos de capacidad (declarados) ---
     clinker_design=5000.0,    # miles t clínker/año (horno, todas las plantas Colombia) SUPUESTO
@@ -37,29 +37,12 @@ S = SUP
 S["share"] = S["argos_col_2025"] / S["nac_2025"]          # participación de mercado
 S["saco_share"] = S["mix"]["UG saco"] + S["mix"]["Estructural saco"]
 
-# ---------------------------------------------------- C2 serie histórica
-# Estacionalidad supuesta (Colombia: ene-feb bajos, mar-oct altos, dic intermedio)
-SEAS = np.array([0.86, 0.90, 0.99, 0.97, 1.03, 1.04, 1.04, 1.06, 1.03, 1.07, 1.05, 0.96])
-SEAS = SEAS / SEAS.mean()
-rng = np.random.default_rng(2026)
-
-def serie_anual(total, growth_within):
-    base = SEAS * (1 + growth_within * (np.arange(12) - 5.5) / 12)
-    noise = 1 + rng.normal(0, 0.012, 12)
-    v = base * noise
-    return v / v.sum() * total
-
-s24 = serie_anual(S["nac_2024"], 0.02)
-s25 = serie_anual(S["nac_2025"], 0.03)
-# 2026 ene-jul calibrado a 7.555,2 con jun=1.061,6 (real); ago supuesto; sep real 1.194,4
-v = SEAS[:7] * (1 + 0.03 * (np.arange(7) - 3) / 12) * (1 + rng.normal(0, 0.01, 7))
-v[5] = 0; r = v.copy(); tot = S["nac_ene_jul_2026"] - S["nac_jun_2026"]
-v[[0, 1, 2, 3, 4, 6]] = r[[0, 1, 2, 3, 4, 6]] / r[[0, 1, 2, 3, 4, 6]].sum() * tot
-v[5] = S["nac_jun_2026"]
-ago26 = 1150.0                                   # supuesto (no recuperado)
-s26 = np.concatenate([v, [ago26, S["nac_sep_2026"]]])
-HIST_NAC = np.concatenate([s24, s25, s26])       # miles t, 33 meses (ene-24 .. sep-26)
-H_LABEL = [date(2024 + (i // 12), i % 12 + 1, 1) for i in range(len(HIST_NAC))]
+# ---------------------------------------------------- C2 serie histórica (DANE ECG, oficial)
+import json, os
+_d = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "datos_dane_ecg_2024_2026.json")))["serie"]
+HIST_NAC = np.array([x[2] for x in _d])                    # miles t, ene-24 .. sep-26
+H_LABEL = [date(x[0], x[1], 1) for x in _d]
+SEAS = None
 HIST_ARG = HIST_NAC * S["share"]                 # demanda Argos Colombia
 
 def mape(a, f): return float(np.mean(np.abs((a - f) / a)) * 100)
@@ -272,7 +255,7 @@ CO2_AHORRO = lib_clk * CO2_CLK                                                  
 
 if __name__ == "__main__":
     print("share", round(S["share"], 4))
-    print("hist nac total 2024/25", s24.sum(), s25.sum(), "2026 ene-jul", s26[:7].sum(), "sep", s26[8])
+    print("hist nac total 2024/25", HIST_NAC[:12].sum(), HIST_NAC[12:24].sum(), "2026 ene-jul", HIST_NAC[24:31].sum(), "sep", HIST_NAC[32])
     for r in RES: print(r)
     print("mejor", MEJOR[0])
     print("DEM", np.round(DEM, 1), DEM.sum())

@@ -19,6 +19,11 @@ A,B,C=M.PLANES; P=M.MEJOR_PLAN["P"]
 ES=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"]; mes=lambda d:f"{ES[d.month-1]}-{str(d.year)[2:]}"
 months_over=[mes(M.PLAN_LABEL[i]) for i in range(12) if M.CLK_REQ[i]>M.CLK_CAP]
 clk_def=np.maximum(0,M.CLK_REQ-M.CLK_CAP).sum()
+g25=S["nac_2025"]/S["nac_2024"]-1; g26=M.HIST_NAC[24:31].sum()/M.HIST_NAC[12:19].sum()-1
+DEMs_=M.DEM.sum(); g_impl=(DEMs_/S["argos_col_2025"])**(1/1.95)-1; cap_year=M.CAP_CEM_REG*12
+yrs=np.log(cap_year/DEMs_)/np.log(1+g_impl); year_hit=int(2027.9+yrs)
+k1=int(sum(1 for x in P if abs(x-P[0])<1e-9)); lbl=lambda i: mes(M.PLAN_LABEL[i])
+rel=max(A["total"]-C["total"],B["total"]-C["total"])/C["total"]*100
 esc_disp=(M.ESC_BASE["total"]-M.ESC_DISP["total"])/1e6; esc_fc=(M.ESC_BASE["total"]-M.ESC_FC["total"])/1e6
 tb=load_workbook("Proyecto_Argos_Modelo_y_Tablero.xlsx",data_only=True)["Tablero"]
 kpi={tb.cell(row=r,column=1).value:(tb.cell(row=r,column=3).value,tb.cell(row=r,column=6).value) for r in range(22,27)}
@@ -93,23 +98,23 @@ tabla(s,7.2,1.6,5.6,["Dato público","Valor"],[["Despachos nacionales 2024",f1(S
 s=slide("El problema de consultoría","Integrante 1. Explicar la pregunta guía y mostrar el proceso.")
 img(s,"fig/f8_proceso.png",0.6,1.4,w=12.1)
 callout(s,0.9,3.9,11.5,1.5,"**¿Cómo debe planear y programar Argos su producción de cemento gris durante los próximos 12 meses para cumplir la demanda al menor costo, identificando la etapa que más limita el sistema?**",size=20)
-text(s,0.9,5.7,11.5,1.2,["La demanda es estacional y crece cerca de 5 % al año; el horno, el activo más caro y menos flexible, tiene capacidad fija."],size=17,bullet=False,color=GRAY)
+text(s,0.9,5.7,11.5,1.2,["La demanda es estacional y crece cerca de 4 % al año; el horno, el activo más caro y menos flexible, tiene capacidad fija."],size=17,bullet=False,color=GRAY)
 
 # 5 coherencia
 s=slide("Cómo se conectan los componentes","Integrante 1 (1 min). Resaltar que todo sale de una hoja de supuestos del Excel.")
 img(s,"fig/f7_flujo.png",0.5,1.6,w=12.3)
-text(s,0.8,3.9,11.8,2.8,["**Una sola hoja de supuestos** alimenta todo el modelo en Excel: si cambia un supuesto, se recalcula todo.","**Datos públicos** (DANE, Grupo Argos) anclan la demanda; los **supuestos** (capacidades, costos) están declarados y justificados.","**Transparencia:** la serie mensual histórica fue reconstruida con totales públicos; los datos del tablero son simulados."],size=19)
+text(s,0.8,3.9,11.8,2.8,["**Una sola hoja de supuestos** alimenta todo el modelo en Excel: si cambia un supuesto, se recalcula todo.","**Datos públicos** (DANE, Grupo Argos) anclan la demanda; los **supuestos** (capacidades, costos) están declarados y justificados.","**Transparencia:** la demanda histórica es la serie oficial del DANE (ECG, boletín sep-2026); los datos del tablero son simulados."],size=19)
 
 # 6 pronóstico 1
 s=slide("Pronóstico (1/2): elegimos Holt-Winters","Integrante 2 (1 min). Tres métodos, misma ventana. Señal de rastreo de los otros dos fuera de ±4.")
 img(s,"fig/f2_mape.png",0.5,1.4,w=6.2)
 tabla(s,7.0,1.6,5.8,["Método","MAD (kt)","MAPE","Señal"],[[["Promedio móvil 3 m","Suav. exp. simple","Holt-Winters"][i],f1(r[1]),pc(r[2]/100),f"{r[3]:.2f}".replace(".",",")] for i,r in enumerate(M.RES)],[2.9,0.9,0.9,1.1],size=12,rowh=0.55)
-callout(s,0.6,5.0,12.1,1.5,f"**Holt-Winters:** MAPE {pc(M.MEJOR[2]/100)} y señal de rastreo ≈ 0. Los otros dos métodos subestiman sistemáticamente (señal ≈ 7,5). Salvedad: serie corta y error in-sample; por eso el MAPE entra al tablero.",size=17)
+callout(s,0.6,5.0,12.1,1.5,f"**Holt-Winters:** MAPE {pc(M.MEJOR[2]/100)} y señal de rastreo ≈ 0. Los otros dos métodos subestiman sistemáticamente (señales de {str(round(M.RES[0][3],1)).replace('.',',')} y {str(round(M.RES[1][3],1)).replace('.',',')}). Salvedad: serie corta y error in-sample; por eso el MAPE entra al tablero.",size=17)
 
 # 7 pronóstico 2
 s=slide("Pronóstico (2/2): demanda de dic-26 a nov-27","Integrante 2 (1 min).")
 img(s,"fig/f1_pronostico.png",0.5,1.35,w=8.3)
-text(s,9.0,1.6,3.9,5,[f"**{f0(M.DEM.sum())} kt** en 12 meses",f"Mínimo: {f1(M.DEM.min())} kt ({mes(M.PLAN_LABEL[int(M.DEM.argmin())])})",f"Máximo: {f1(M.DEM.max())} kt ({mes(M.PLAN_LABEL[int(M.DEM.argmax())])})","Crecimiento ≈ 5 % anual, coherente con el DANE (4,9 % en 2025; 4,3 % ene–jul 2026)"],size=17)
+text(s,9.0,1.6,3.9,5,[f"**{f0(M.DEM.sum())} kt** en 12 meses",f"Mínimo: {f1(M.DEM.min())} kt ({mes(M.PLAN_LABEL[int(M.DEM.argmin())])})",f"Máximo: {f1(M.DEM.max())} kt ({mes(M.PLAN_LABEL[int(M.DEM.argmax())])})",f"Crecimiento ≈ {pc(g_impl,0)} anual, coherente con el DANE ({pc(g25)} en 2025; {pc(g26)} ene–jul 2026)"],size=17)
 
 # 8 capacidad 1
 s=slide("Capacidad (1/2): el horno es la etapa más cargada","Integrante 3 (1 min). Capacidades diseñadas son supuestos declarados.")
@@ -121,7 +126,7 @@ text(s,0.6,5.7,12.1,1.2,["Efectiva = diseñada × disponibilidad o eficiencia (8
 # 9 capacidad 2
 s=slide("Capacidad (2/2): estrategia de ajuste","Integrante 3 (1 min).")
 img(s,"fig/f3_util.png",0.5,1.4,w=7.6)
-text(s,8.3,1.5,4.6,5.3,[f"Solo {f1(np.maximum(0,M.DEM-M.CAP_CEM_REG).sum())} kt de cemento exceden la capacidad regular","**Recomendación:** estrategia de **ajuste (match)**, no adelantarse con un nuevo horno","La brecha es pequeña y concentrada: se cubre con inventario previo y mejoras en el horno","**Alerta:** con +5 % anual, la demanda alcanzaría la capacidad regular hacia 2029"],size=17)
+text(s,8.3,1.5,4.6,5.3,[f"Solo {f1(np.maximum(0,M.DEM-M.CAP_CEM_REG).sum())} kt de cemento exceden la capacidad regular","**Recomendación:** estrategia de **ajuste (match)**, no adelantarse con un nuevo horno","La brecha es pequeña y concentrada: se cubre con inventario previo y mejoras en el horno",f"**Alerta:** con ≈ {pc(g_impl,0)} anual, la demanda alcanzaría la capacidad regular hacia {year_hit}"],size=17)
 
 # 10 plan agregado 1
 s=slide("Plan agregado (1/2): tres estrategias","Integrante 4 (1 min). Mostrar la lógica de cada estrategia.")
@@ -129,10 +134,10 @@ img(s,"fig/f4_agregado.png",0.4,1.35,w=8.4)
 text(s,9.0,1.5,4.0,5.3,["**A. Nivelación:** producción constante; la estacionalidad se absorbe con inventario","**B. Persecución:** producir lo que se demanda cada mes","**C. Mixta:** dos niveles de producción, optimizados","Costos: producción, inventario (22 % anual), cambio de ritmo, sobrecosto sobre capacidad regular y faltantes"],size=16)
 
 # 11 plan agregado 2
-s=slide("Plan agregado (2/2): la estrategia mixta gana","Integrante 4 (1 min). Sensibilidad: gana en los 5 escenarios probados; la diferencia relativa es pequeña (<0,5 %), pero equivale a miles de millones.")
+s=slide("Plan agregado (2/2): la estrategia mixta gana","Integrante 4 (1 min). Sensibilidad: gana en los 5 escenarios probados; la diferencia relativa es pequeña (≤ 0,4 %), pero equivale a miles de millones.")
 def crow(p): return [p["nombre"].split(" (")[0],mm(p["prod"]),mm(p["inv"]),mm(p["cambio"]),mm(p["falt"]),mm(p["total"])]
 tabla(s,0.6,1.5,12.1,["Estrategia (MM COP)","Producción","Inventario","Cambio ritmo","Faltante","TOTAL"],[crow(p) for p in M.PLANES],[3.6,1.9,1.7,1.7,1.4,1.8],size=14,rowh=0.55)
-callout(s,0.6,3.9,5.9,2.6,f"**Mixta:** {f1(P[0])} kt/mes hasta mar-27 y {f1(P[4])} kt/mes de abr a nov. Cumple el 100 % de la demanda sin comprar clínker.",size=18)
+callout(s,0.6,3.9,5.9,2.6,f"**Mixta:** {f1(P[0])} kt/mes hasta {lbl(k1-1)} y {f1(P[k1])} kt/mes de {lbl(k1)} a {lbl(11)}. Cumple el 100 % de la demanda sin comprar clínker.",size=18)
 callout(s,6.8,3.9,5.9,2.6,f"**Ahorro:** {f0((A['total']-C['total'])/1e6)} MM COP vs. nivelación y {f0((B['total']-C['total'])/1e6)} MM vs. persecución. Gana en los 5 escenarios de sensibilidad probados.",fill=LIGHT,size=18)
 
 # 12 MPS
@@ -156,12 +161,12 @@ text(s,0.5,5.0,12.3,1.8,["**Industria 4.0:** mantenimiento predictivo del horno 
 
 # 17 supuestos y limitaciones
 s=slide("Supuestos y limitaciones","Integrante 3 o 4 (1 min). Ser transparentes: es lo que pide la docente.")
-text(s,0.6,1.4,6,5.5,["**Datos públicos:** DANE y Grupo Argos (totales anuales, acumulado 2026, Argos Colombia 2025)","**Reconstruido:** serie mensual histórica, calibrada con esos totales","**Supuestos declarados:** capacidades, precios, costos, mezcla","**Simulado:** pedidos del MPS y datos del tablero"],size=18)
-text(s,6.9,1.4,6,5.5,["**Limitaciones:**","La serie es corta (el error del pronóstico es in-sample)","La etapa más cargada depende de las capacidades supuestas","No se estimó el costo de implementar las recomendaciones","Participación de mercado constante"],size=18)
+text(s,0.6,1.4,6,5.5,["**Datos públicos oficiales:** serie mensual de despachos del DANE (ECG, boletín sep-2026) y Argos Colombia 2025 (Grupo Argos)","**Supuestos declarados:** capacidades, precios, costos, mezcla","**Simulado:** pedidos del MPS y datos del tablero"],size=18)
+text(s,6.9,1.4,6,5.5,["**Limitaciones:**","La serie es corta (33 meses) y las cifras de 2026 son provisionales; el error del pronóstico es in-sample","La etapa más cargada depende de las capacidades supuestas","No se estimó el costo de implementar las recomendaciones","Participación de mercado constante"],size=18)
 
 # 18 conclusiones
 s=slide("Conclusiones","Integrante 5 (1 min) y cierre. Abrir a preguntas.")
-text(s,0.6,1.4,12.2,4.4,[f"Demanda de **{f0(M.DEM.sum())} kt** (≈ +5 % anual); Holt-Winters, el método más preciso","El **horno de clínker** es la etapa más cargada y solo supera su capacidad en el pico","La **estrategia mixta** minimiza el costo y cumple el 100 % de la demanda sin comprar clínker","MPS coherente con el plan agregado; el ATP indica cuánto se puede prometer en cada campaña","Reducir el factor clínker une **productividad y sostenibilidad**"],size=20)
+text(s,0.6,1.4,12.2,4.4,[f"Demanda de **{f0(M.DEM.sum())} kt** (≈ +{pc(g_impl,0)} anual); Holt-Winters, el método más preciso","El **horno de clínker** es la etapa más cargada y solo supera su capacidad en el pico","La **estrategia mixta** minimiza el costo y cumple el 100 % de la demanda sin comprar clínker","MPS coherente con el plan agregado; el ATP indica cuánto se puede prometer en cada campaña","Reducir el factor clínker une **productividad y sostenibilidad**"],size=20)
 callout(s,0.6,5.7,12.2,1.0,"Gracias. ¿Preguntas?",size=26)
 
 def src(slide,txt):

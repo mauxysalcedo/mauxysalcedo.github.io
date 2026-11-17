@@ -12,7 +12,7 @@ from matplotlib.ticker import FuncFormatter
 ESF=FuncFormatter(lambda x,p:fmt(mdates.num2date(x)))
 # 1 pronóstico
 fig,ax=plt.subplots(figsize=(8,3.6))
-ax.plot(M.H_LABEL,M.HIST_ARG,color=NAVY,lw=2,label="Demanda Argos (reconstruida)")
+ax.plot(M.H_LABEL,M.HIST_ARG,color=NAVY,lw=2,label="Demanda Argos (DANE × participación)")
 ax.plot(M.H_LABEL[13:],M.f_hw[13:],color=GOLD,lw=1.6,ls="--",label="Holt-Winters (1 paso)")
 ax.plot(M.FUT_LABEL,M.FUT_ARG,color=GREEN,lw=2,label="Pronóstico oct-26 a nov-27")
 ax.axvspan(M.PLAN_LABEL[0],M.PLAN_LABEL[-1],color=GOLD,alpha=.12,label="Horizonte de planeación")

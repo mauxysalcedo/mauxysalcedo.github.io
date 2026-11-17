@@ -17,6 +17,7 @@ NAVY = RGBColor(0x0B, 0x1F, 0x3A)
 def f0(x): return f"{x:,.0f}".replace(",", ".")
 def f1(x): return f"{x:,.1f}".replace(",", "X").replace(".", ",").replace("X", ".")
 def pc(x, d=1): return f"{x*100:.{d}f} %".replace(".", ",")
+def d1(x): return f"{x:.1f}".replace(".", ",")
 def mm(x): return f0(x / 1e6)          # COP -> millones
 
 d = Document()
@@ -77,7 +78,7 @@ NOTAS = {
  "MPS simplificado": "Los pedidos firmes son simulados. Elaboración propia con el modelo de Excel adjunto.",
  "Datos simulados": "Datos simulados con el modelo de Excel adjunto (hoja Tablero).",
  "Supuestos consolidados": "Elaboración propia. La columna Verificar indica qué debe contrastarse con fuentes antes de la entrega.",
- "Demanda histórica": "Serie histórica reconstruida con base en datos del DANE (2026). Elaboración propia.",
+ "Demanda histórica": "Serie oficial del DANE (2026) multiplicada por la participación de mercado de Argos. Elaboración propia.",
 }
 def nota_para(caption):
     for k, v in NOTAS.items():
@@ -158,6 +159,16 @@ SENS = []
 for cb, iv in ((0, 0.22), (20000, 0.22), (60000, 0.22), (20000, 0.12), (20000, 0.35)):
     pl = sens(cb, iv); tots = [p["total"] for p in pl]; k = int(np.argmin(tots))
     SENS.append([f0(cb), pc(iv, 0), "A. Nivelación" if k == 0 else "B. Persecución" if k == 1 else "C. Mixta", mm(tots[0]), mm(tots[1]), mm(tots[2])])
+ej26 = M.HIST_NAC[24:31].sum(); ej25 = M.HIST_NAC[12:19].sum(); g26 = ej26 / ej25 - 1
+g25 = S["nac_2025"] / S["nac_2024"] - 1
+g_impl = (DEMs / S["argos_col_2025"]) ** (1 / 1.95) - 1
+yrs = np.log(cap_year / DEMs) / np.log(1 + g_impl); year_hit = int(2027.9 + yrs)
+k1 = int(sum(1 for x in P if abs(x - P[0]) < 1e-9))
+lbl = lambda i: mes(M.PLAN_LABEL[i])
+n_over = int((M.DEM > M.CAP_CEM_REG).sum())
+below_p = [lbl(t) for t in range(12) if M.DEM[t] > P[t]]
+SENSN = [[(sens(cb, iv)[i]["total"] / 1e6) for i in range(3)] for cb, iv in ((0, 0.22), (20000, 0.22), (60000, 0.22), (20000, 0.12), (20000, 0.35))]
+rel = max((A["total"] - Cc["total"]) / Cc["total"], (B["total"] - Cc["total"]) / Cc["total"]) * 100
 # =============================================================== PORTADA (formato APA 7 para trabajos estudiantiles)
 for _ in range(4): para("", align="c")
 para("Consultoría simulada de producción inteligente: diagnóstico y plan de mejora del sistema de producción de cemento gris de Cementos Argos en Colombia", bold=True, align="c")
@@ -189,21 +200,21 @@ para("**Cómo se conectan los componentes.** Un libro de Excel (anexo) concentra
 fig("fig/f7_flujo.png", 12.5, "Figura 1. Flujo de coherencia entre los componentes del proyecto.")
 para("**Transparencia sobre los datos.** Distinguimos tres tipos de cifras:", after=2)
 bullets([
- "**Datos públicos:** despachos nacionales anuales del Departamento Administrativo Nacional de Estadística [DANE] (2026), a saber, 12.109,6 kt en 2024 y 12.708,0 kt en 2025), el acumulado enero-julio de 2026 (7.555,2 kt) y los despachos de junio y septiembre de 2026; y las 5,0 millones de toneladas de cemento de la regional Colombia reportadas por Grupo Argos para 2025.",
- "**Datos reconstruidos:** no pudimos descargar la serie mensual oficial del DANE desde nuestro entorno de trabajo. Reconstruimos los 33 meses (ene-24 a sep-26) con una estacionalidad supuesta, calibrada para que los totales coincidan con las cifras públicas anteriores. La hoja 'Historico' del Excel permite reemplazarla por la serie oficial.",
+ f"**Datos públicos oficiales:** la serie mensual de despachos nacionales de cemento gris del Departamento Administrativo Nacional de Estadística [DANE] (2026), Anexo A1 del boletín de septiembre de 2026 (las cifras de 2026 son provisionales), de la que salen {f1(S['nac_2024'])} kt en 2024 y {f1(S['nac_2025'])} kt en 2025; y las 5,0 millones de toneladas de cemento de la regional Colombia reportadas por Grupo Argos (2026) para 2025.",
  "**Supuestos:** capacidades por etapa, costos y precios, que no son información pública. Se declaran, se justifican y se usan de forma idéntica en todas las secciones (Anexo A).",
+ "**Datos simulados:** los pedidos firmes del MPS y los valores 'reales' del tablero, que se generaron para demostrar cómo funcionan.",
 ])
 para("**Uso de inteligencia artificial.** Se utilizó una herramienta de IA generativa como apoyo para la búsqueda de fuentes, el cálculo y la redacción. Las decisiones y supuestos fueron revisados por el equipo, conforme a la política de integridad académica del curso.", align="j")
 
 # =============================================================== 2 CONTEXTO
 h1(TOC[1])
 para("**La empresa.** Cementos Argos es una cementera colombiana con operaciones en Colombia, el Caribe y Centroamérica. En 2025 reportó despachos de cemento del orden de 9,3 millones de toneladas (Grupo Argos, 2026) y una capacidad instalada de cemento de 14,4 millones de toneladas considerando todas sus regionales (Argos, 2025); ambas cifras deben contrastarse con el reporte integrado vigente. Para este proyecto solo se analiza la regional Colombia, que Grupo Argos (2026) reporta con 5,0 millones de toneladas de cemento en 2025. Otra fuente de prensa cita 5,4 millones, probablemente por un alcance distinto; usamos 5,0 por provenir del informe oficial y lo marcamos como dato a verificar.", align="j")
-para(f"**El mercado.** Según el Departamento Administrativo Nacional de Estadística [DANE] (2026), los despachos nacionales de cemento gris fueron de {f1(S['nac_2025'])} kt en 2025, un {pc(S['nac_2025']/S['nac_2024']-1)} más que en 2024 ({f1(S['nac_2024'])} kt), y el acumulado de enero a julio de 2026 creció 4,3 % frente al mismo periodo de 2025. La participación de Argos en Colombia, calculada por nosotros como 5.000 / {f1(S['nac_2025'])}, es de **{pc(S['share'])}**.", align="j")
+para(f"**El mercado.** Según el Departamento Administrativo Nacional de Estadística [DANE] (2026), los despachos nacionales de cemento gris fueron de {f1(S['nac_2025'])} kt en 2025, un {pc(S['nac_2025']/S['nac_2024']-1)} más que en 2024 ({f1(S['nac_2024'])} kt), y el acumulado de enero a julio de 2026 creció {pc(g26)} frente al mismo periodo de 2025. La participación de Argos en Colombia, calculada por nosotros como 5.000 / {f1(S['nac_2025'])}, es de **{pc(S['share'])}**.", align="j")
 para("**Productos y tipo de sistema productivo.** Consideramos tres productos: cemento de uso general (UG) en saco, cemento estructural en saco y cemento a granel (45 %, 20 % y 35 % de las toneladas, supuesto). El sistema es de **proceso continuo** en la etapa de horno (el clínker se produce de forma ininterrumpida y se detiene solo por mantenimiento) y de **producción por lotes o campañas** en la molienda y el ensacado, donde se cambia de tipo de cemento y de presentación.", align="j")
 ctx = [["Despachos nacionales de cemento gris 2024 (kt)", f1(S["nac_2024"]), "DANE (2026)"],
        ["Despachos nacionales de cemento gris 2025 (kt)", f1(S["nac_2025"]), "DANE (2026)"],
        ["Crecimiento 2025 frente a 2024", pc(S["nac_2025"]/S["nac_2024"]-1), "Calculado"],
-       ["Acumulado ene–jul 2026: 7.555,2 kt frente a 7.245,5 kt (2025)", "+4,3 %", "DANE (2026)"],
+       [f"Acumulado ene–jul 2026: {f1(ej26)} kt frente a {f1(ej25)} kt (2025)", f"+{pc(g26)}", "DANE (2026)"],
        ["Cemento Argos regional Colombia 2025 (kt)", "5.000,0", "Grupo Argos (2026)"],
        ["Participación de mercado de Argos (calculada)", pc(S["share"]), "Calculada"]]
 table(["Indicador de contexto", "Valor", "Fuente"], ctx, [9.5, 3, 4], size=9, caption="Tabla 1. Cifras públicas que anclan el análisis.")
@@ -213,19 +224,19 @@ para("**Proceso.** La materia prima (caliza y arcilla) se tritura y se cocina en
 
 # =============================================================== 3 PRONÓSTICO
 h1(TOC[2])
-para(f"**Producto y datos.** Se pronostica la demanda mensual de cemento gris de Argos Colombia, calculada como despachos nacionales multiplicados por la participación de mercado ({pc(S['share'])}). Se asume que la participación se mantiene constante en el horizonte. La serie cubre enero de 2024 a septiembre de 2026 (33 meses; ver nota de reconstrucción en la introducción). No se incluye 2020 ni años anteriores: se evitan así los efectos de la pandemia sin necesidad de ajustes.", align="j")
+para(f"**Producto y datos.** Se pronostica la demanda mensual de cemento gris de Argos Colombia, calculada como despachos nacionales multiplicados por la participación de mercado ({pc(S['share'])}). Se asume que la participación se mantiene constante en el horizonte. La serie cubre enero de 2024 a septiembre de 2026 (33 meses de la serie oficial del DANE). No se incluye 2020 ni años anteriores: se evitan así los efectos de la pandemia sin necesidad de ajustes.", align="j")
 para("**Métodos comparados.** Se compararon tres métodos vistos en el curso, evaluados sobre la misma ventana (enero de 2025 a septiembre de 2026) con las medidas MAD, MAPE y señal de rastreo (Heizer et al., 2020; Hyndman y Athanasopoulos, 2021):", after=2)
 bullets(["Promedio móvil de 3 meses (no captura estacionalidad ni tendencia).", f"Suavización exponencial simple con α = {M.SES_A:.1f} (captura el nivel, no la estacionalidad).", f"Holt-Winters multiplicativo con α = {M.HW_A:.1f}, β = {M.HW_B:.2f} y γ = {M.HW_G:.1f} (nivel, tendencia y estacionalidad de 12 meses), con parámetros elegidos por búsqueda en cuadrícula."])
 rows = [[r[0].split(" (")[0], f1(r[1]), pc(r[2] / 100), f"{r[3]:.2f}".replace(".", ",")] for r in M.RES]
 table(["Método", "MAD (kt)", "MAPE", "Señal de rastreo"], rows, [7, 3, 3, 3.5], caption="Tabla 2. Medidas de error de los tres métodos (ventana común de evaluación).")
-para(f"**Selección.** Holt-Winters tiene el menor error (MAPE {pc(M.MEJOR[2]/100)}) y la única señal de rastreo cercana a cero ({M.MEJOR[3]:.2f}). Los otros dos métodos tienen señales de rastreo de 7,5 y 7,6, muy fuera del rango habitual de ±4: subestiman sistemáticamente una demanda con tendencia y estacionalidad. **Advertencia:** la serie tiene solo unas 2,75 temporadas y el error es *in-sample* (los parámetros se ajustaron con los mismos datos), por lo que el MAPE real a futuro será mayor. Por eso el tablero de indicadores (véase Tablero de indicadores) incluye el MAPE como indicador de seguimiento.".replace(".", ".") , align="j")
-para("**Construcción del modelo elegido.** Holt-Winters multiplicativo (Hyndman y Athanasopoulos, 2021) actualiza tres componentes en cada mes t: el nivel L, la tendencia T y un índice estacional S de 12 meses (Winters, 1960). El pronóstico de h meses adelante es (L + h·T) multiplicado por el índice estacional del mes correspondiente. Con γ = 0,7 el índice estacional se adapta rápido, lo que es razonable para una serie con una caída marcada en diciembre y enero, mientras que α = 0,1 y β = 0,10 hacen que nivel y tendencia cambien con lentitud y no reaccionen en exceso al ruido mensual. Los pronósticos de octubre y noviembre de 2026 se calculan, pero quedan fuera del horizonte de planeación (que empieza en diciembre).", align="j")
+para(f"**Selección.** Holt-Winters tiene el menor error (MAPE {pc(M.MEJOR[2]/100)}) y la única señal de rastreo cercana a cero ({str(round(M.MEJOR[3],2)).replace('.',',')}). Los otros dos métodos tienen señales de rastreo de {str(round(M.RES[0][3],1)).replace('.',',')} y {str(round(M.RES[1][3],1)).replace('.',',')}, fuera del rango habitual de ±4: subestiman sistemáticamente una demanda con tendencia y estacionalidad. **Advertencia:** la serie tiene solo unas 2,75 temporadas y el error es in-sample (los parámetros se ajustaron con los mismos datos), por lo que el error real a futuro puede ser mayor. Por eso el tablero de indicadores (véase Tablero de indicadores) incluye el MAPE como indicador de seguimiento.".replace(".", ".").replace(" 5,9", " 5,9"), align="j")
+para("**Construcción del modelo elegido.** Holt-Winters multiplicativo (Hyndman y Athanasopoulos, 2021) actualiza tres componentes en cada mes t: el nivel L, la tendencia T y un índice estacional S de 12 meses (Winters, 1960). El pronóstico de h meses adelante es (L + h·T) multiplicado por el índice estacional del mes correspondiente. Con γ = 0,7 el índice estacional se adapta rápido, lo que es razonable para una serie con una caída marcada en enero, mientras que α = 0,1 y β = 0,05 hacen que nivel y tendencia cambien con lentitud y no reaccionen en exceso al ruido mensual. Los pronósticos de octubre y noviembre de 2026 se calculan, pero quedan fuera del horizonte de planeación (que empieza en diciembre).", align="j")
 fig("fig/f1_pronostico.png", 12.5, "Figura 3. Demanda histórica de Argos Colombia, ajuste de Holt-Winters y pronóstico.")
 fr = []
 for i in range(6):
     fr.append([mes(M.PLAN_LABEL[i]), f1(M.DEM[i]), mes(M.PLAN_LABEL[i+6]), f1(M.DEM[i+6])])
 table(["Mes", "Demanda (kt)", "Mes", "Demanda (kt)"], fr, [3, 3.5, 3, 3.5], size=9, caption="Tabla 3. Demanda pronosticada de Argos Colombia en el horizonte de planeación.")
-para(f"**Resultado.** La demanda pronosticada para el horizonte de planeación suma **{f1(DEMs)} kt** (promedio de {f1(DEMs/12)} kt/mes), con un mínimo de {f1(M.DEM.min())} kt en {mes(M.PLAN_LABEL[int(M.DEM.argmin())])} y un máximo de {f1(M.DEM.max())} kt en {mes(M.PLAN_LABEL[int(M.DEM.argmax())])}. Esto implica un crecimiento de aproximadamente 5 % anual frente a las 5.000 kt de 2025, coherente con el crecimiento nacional de 4,9 % en 2025 y 4,3 % en 2026. Esta serie es el insumo de los análisis de capacidad, plan agregado y MPS.", align="j")
+para(f"**Resultado.** La demanda pronosticada para el horizonte de planeación suma **{f1(DEMs)} kt** (promedio de {f1(DEMs/12)} kt/mes), con un mínimo de {f1(M.DEM.min())} kt en {mes(M.PLAN_LABEL[int(M.DEM.argmin())])} y un máximo de {f1(M.DEM.max())} kt en {mes(M.PLAN_LABEL[int(M.DEM.argmax())])}. Esto implica un crecimiento de aproximadamente {pc(g_impl,0)} anual frente a las 5.000 kt de 2025, coherente con el crecimiento nacional de {pc(g25)} en 2025 y de {pc(g26)} en enero–julio de 2026. Esta serie es el insumo de los análisis de capacidad, plan agregado y MPS.", align="j")
 
 # =============================================================== 4 CAPACIDAD
 h1(TOC[3])
@@ -236,8 +247,8 @@ for k in M.REQ:
 table(["Etapa", "Diseño anual (kt)", "Diseño mensual", "Efectiva mensual", "Requerida media", "Requerida pico", "Utiliz. media", "Utiliz. pico"], cr, [3.3, 2, 2, 2, 2, 2, 1.9, 1.9], size=8.5, caption="Tabla 4. Capacidad diseñada, efectiva y utilización por etapa (kt/mes; dic-26 a nov-27).")
 para("**Definiciones.** Se usan las definiciones habituales de capacidad (Heizer et al., 2020). *Capacidad diseñada*: producción máxima teórica de la etapa. *Capacidad efectiva*: la diseñada por la disponibilidad o eficiencia (descuenta paros y pérdidas de ritmo). *Utilización*: requerimiento dividido entre capacidad efectiva; indica qué tan cargada está la etapa y, por encima de 100 %, que la demanda no cabe. *Eficiencia*: relación entre la capacidad efectiva y la diseñada (88 %, 90 % y 85 % en las tres etapas).".replace("*",""), align="j")
 fig("fig/f3_util.png", 12.5, "Figura 4. Utilización mensual de la capacidad efectiva por etapa. Sobre la línea roja la demanda excede la capacidad.")
-para(f"**Resultado.** El **horno** es la etapa con mayor utilización ({pc(M.UTIL_AVG['Horno (clínker)'])} en promedio) y la única que supera el 100 % en los meses pico ({', '.join(months_over)}, con un máximo de {pc(M.UTIL_MAX['Horno (clínker)'])}). La molienda y el ensacado tienen holgura. En términos de cemento, el sistema puede producir **{f1(M.CAP_CEM_REG)} kt/mes** con recursos regulares, limitado por el horno. Con recursos extra (compra de clínker, molienda adicional) se asume una capacidad máxima de {f1(M.CAP_CEM_EXT)} kt/mes (+8 %). Solo {f1(np.maximum(0, M.DEM - M.CAP_CEM_REG).sum())} kt de cemento (en dos o tres meses) exceden la capacidad regular.", align="j")
-para(f"**Estrategia de capacidad.** Recomendamos una estrategia de **ajuste (*match*) con mejoras incrementales**, y no adelantarse con una nueva línea de horno. La brecha en 2027 es pequeña y se concentra en pocos meses, de modo que no justifica una inversión grande; se cubre con inventario previo y con mejoras en el horno. El riesgo es el crecimiento: con 5 % anual, la demanda media alcanzaría la capacidad regular anual ({f0(cap_year)} kt) en aproximadamente {yrs:.1f} años después del horizonte, es decir, hacia 2029. Ese es el punto en que la decisión de capacidad debe replantearse con una evaluación financiera de inversión.", align="j")
+para(f"**Resultado.** El **horno** es la etapa con mayor utilización ({pc(M.UTIL_AVG['Horno (clínker)'])} en promedio) y la única que supera el 100 % en el pico ({', '.join(months_over)}, con un máximo de {pc(M.UTIL_MAX['Horno (clínker)'])}). La molienda y el ensacado tienen holgura. En términos de cemento, el sistema puede producir **{f1(M.CAP_CEM_REG)} kt/mes** con recursos regulares, limitado por el horno. Con recursos extra (compra de clínker, molienda adicional) se asume una capacidad máxima de {f1(M.CAP_CEM_EXT)} kt/mes (+8 %). Solo {f1(np.maximum(0, M.DEM - M.CAP_CEM_REG).sum())} kt de cemento ({n_over} mes) exceden la capacidad regular.", align="j")
+para(f"**Estrategia de capacidad.** Recomendamos una estrategia de **ajuste (*match*) con mejoras incrementales**, y no adelantarse con una nueva línea de horno. La brecha en 2027 es pequeña y se concentra en el mes pico, de modo que no justifica una inversión grande; se cubre con inventario previo y con mejoras en el horno. El riesgo es el crecimiento: con un crecimiento de {pc(g_impl,0)} anual (el implícito en el pronóstico), la demanda alcanzaría la capacidad regular anual ({f0(cap_year)} kt) en aproximadamente {d1(yrs)} años después del horizonte, es decir, hacia {year_hit}. Ese es el punto en que la decisión de capacidad debe replantearse con una evaluación financiera de inversión.", align="j")
 para("**Nota metodológica.** El resultado de que el horno sea la etapa más cargada depende de las capacidades supuestas. Es la configuración típica de una cementera (el horno es el activo más caro y menos flexible), pero debe confirmarse con datos internos o con una entrevista a la empresa en una consultoría real.", align="j", italic=True)
 
 # =============================================================== 5 PLAN AGREGADO
@@ -255,7 +266,7 @@ fig("fig/f4_agregado.png", 13.5, "Figura 5. Producción de cada estrategia frent
 def costrow(p): return [p["nombre"], mm(p["prod"]), mm(p["extra"]), mm(p["inv"]), mm(p["cambio"]), mm(p["falt"]), mm(p["total"])]
 table(["Estrategia", "Producción", "Sobrecosto", "Inventario", "Cambio de ritmo", "Faltante", "TOTAL"], [costrow(p) for p in M.PLANES], [4.6, 2.2, 1.9, 1.9, 2.2, 1.7, 2.3], size=8.5, caption="Tabla 5. Costos relevantes por estrategia (millones de COP, horizonte de 12 meses).")
 pm = [f0(x) for x in P]
-para(f"**Resultado.** La estrategia **mixta** es la de menor costo ({mm(Cc['total'])} millones de COP): produce {f1(P[0])} kt/mes de {mes(M.PLAN_LABEL[0])} a {mes(M.PLAN_LABEL[3])} y {f1(P[4])} kt/mes de {mes(M.PLAN_LABEL[4])} a {mes(M.PLAN_LABEL[11])}. Cumple toda la demanda (fill rate de 100 %) sin comprar clínker, porque mantiene la producción dentro de la capacidad regular y cubre los picos de septiembre a noviembre con el inventario acumulado (máximo de {f0(inv_max)} kt en {mes(inv_max_m)}, que representa solo {inv_max/M.DEM[M.PLAN_LABEL.index(inv_max_m)]:.1f} meses de demanda, muy por debajo del límite de 1,5 meses por vida útil del cemento en saco). Ahorra {f0(ahorro_AC)} millones de COP frente a la nivelación y {f0(ahorro_BC)} millones frente a la persecución. La persecución obliga a mover el horno cada mes, y la nivelación acumula más inventario.", align="j")
+para(f"**Resultado.** La estrategia **mixta** es la de menor costo ({mm(Cc['total'])} millones de COP): produce {f1(P[0])} kt/mes de {lbl(0)} a {lbl(k1-1)} y {f1(P[k1])} kt/mes de {lbl(k1)} a {lbl(11)}. Cumple toda la demanda (fill rate de 100 %) sin comprar clínker, porque mantiene la producción dentro de la capacidad regular y cubre los meses en que la demanda supera la producción ({', '.join(below_p)}) con el inventario acumulado (máximo de {f0(inv_max)} kt en {mes(inv_max_m)}, que representa solo {d1(inv_max/M.DEM[M.PLAN_LABEL.index(inv_max_m)])} meses de demanda, muy por debajo del límite de 1,5 meses por vida útil del cemento en saco). Ahorra {f0(ahorro_AC)} millones de COP frente a la nivelación y {f0(ahorro_BC)} millones frente a la persecución. La persecución obliga a mover el horno cada mes, y la nivelación acumula más inventario.", align="j")
 pr = []
 for r_ in rC:
     clk = r_["prod"] * S["factor_clinker"]
@@ -263,8 +274,8 @@ for r_ in rC:
 table(["Mes", "Demanda (kt)", "Producción (kt)", "Inventario final (kt)", "Faltante (kt)", "Utilización del horno"], pr, [2.2, 2.8, 3, 3.2, 2.5, 3], size=8.5, caption="Tabla 6. Plan agregado elegido (estrategia mixta), mes a mes.")
 para("**Sensibilidad.** Como los costos de cambiar el ritmo y de mantener inventario son supuestos, se recalculó el plan con otros valores para ver si la recomendación cambia:", align="j", after=2)
 table(["Costo de cambio (COP/t)", "Inventario (% anual)", "Mejor estrategia", "A (MM COP)", "B (MM COP)", "C (MM COP)"], SENS, [3.4, 2.8, 3.2, 2.7, 2.7, 2.7], size=8.5, caption="Tabla 7. Sensibilidad del ranking de estrategias.")
-para("La estrategia mixta es la de menor costo en los cinco escenarios probados. Incluso si cambiar el ritmo del horno no costara nada, la mixta sigue siendo la mejor (la ventaja sobre la persecución se reduce a unos 1.800 millones de COP, frente a unos 3.900 en el caso base) porque, además, mantiene menos inventario. Cuando el costo de cambiar el ritmo es alto (60.000 COP/t), la persecución pasa a ser la peor opción, incluso peor que la nivelación. El costo de mantener inventario cambia el nivel de los costos, pero no el orden: con 12 % anual, nivelación y persecución quedan casi empatadas, y con 35 % la mixta amplía su ventaja. La recomendación es, por tanto, robusta frente a estos dos supuestos.", align="j")
-para("**Lectura crítica.** Las tres estrategias cuestan casi lo mismo (la diferencia es menor al 0,5 %), porque el costo de producción domina y la demanda cabe en la capacidad. El ahorro de la mixta, aunque pequeño en términos porcentuales, equivale a miles de millones de pesos al año y, sobre todo, reduce la dependencia de comprar clínker en los picos. La ventaja de la mixta se mantiene al variar los costos de cambio de ritmo y de inventario (ver la sensibilidad más abajo), aunque su tamaño sí depende de ellos.", align="j")
+para(f"La estrategia mixta es la de menor costo en los cinco escenarios probados. Incluso si cambiar el ritmo del horno no costara nada, la mixta sigue siendo la mejor, pero su ventaja sobre la persecución se reduce a unos {f0(SENSN[0][1]-SENSN[0][2])} millones de COP (frente a unos {f0(SENSN[1][1]-SENSN[1][2])} en el caso base). Cuando el costo de cambiar el ritmo es alto (60.000 COP/t), la persecución es la peor opción por amplio margen ({f0(SENSN[2][1]-SENSN[2][2])} millones de COP por encima de la mixta). El costo de mantener inventario no cambia el ganador: con 12 % anual la ventaja de la mixta sobre la nivelación se reduce a {f0(SENSN[3][0]-SENSN[3][2])} millones, y con 35 % sube a {f0(SENSN[4][0]-SENSN[4][2])} millones. La recomendación es, por tanto, robusta frente a estos dos supuestos, aunque el tamaño del ahorro depende de ellos.", align="j")
+para(f"**Lectura crítica.** Las tres estrategias cuestan casi lo mismo (la diferencia es de {d1(rel)} % o menos), porque el costo de producción domina y la demanda cabe en la capacidad. El ahorro de la mixta, aunque pequeño en términos porcentuales, equivale a miles de millones de pesos al año y, sobre todo, reduce la dependencia de comprar clínker en los picos. La ventaja de la mixta se mantiene al variar los costos de cambio de ritmo y de inventario (ver la sensibilidad más abajo), aunque su tamaño sí depende de ellos.", align="j")
 
 # =============================================================== 6 MPS
 h1(TOC[5])
@@ -296,18 +307,18 @@ para("**Justificación de las metas.** El MAPE de 5 % es exigente pero coherente
 h1(TOC[7])
 para("Las recomendaciones se priorizan por su valor financiero estimado con el modelo y por su efecto en sostenibilidad. Cada una indica el hallazgo del que sale, la acción y el indicador de seguimiento. Los valores no son aditivos (los escenarios se evalúan por separado sobre el mismo plan) y no incluyen el costo de implementarlas, que no fue estimado por falta de datos.", align="j")
 rec = [
- ["1", "Adoptar el plan agregado mixto", f"Plan agregado: es la estrategia de menor costo y no requiere comprar clínker.", f"Producir {f1(P[0])} kt/mes hasta marzo y {f1(P[4])} kt/mes de abril a noviembre, acumulando inventario previo al pico.", f"{f0(ahorro_AC)} (vs. nivelación) y {f0(ahorro_BC)} (vs. persecución)", "Cumplimiento MPS; fill rate"],
+ ["1", "Adoptar el plan agregado mixto", f"Plan agregado: es la estrategia de menor costo y no requiere comprar clínker.", f"Producir {f1(P[0])} kt/mes hasta {lbl(k1-1)} y {f1(P[k1])} kt/mes de {lbl(k1)} a {lbl(11)}, acumulando inventario previo al pico.", f"{f0(ahorro_AC)} (vs. nivelación) y {f0(ahorro_BC)} (vs. persecución)", "Cumplimiento MPS; fill rate"],
  ["2", "Reducir el factor clínker de 0,75 a 0,72 (ESG)", f"Capacidad: el horno es la etapa más cargada y el clínker es su insumo escaso y de mayores emisiones.", f"Aumentar el uso de adiciones, verificando que los productos cumplan sus normas técnicas.", f"{f0(esc_fc)} en el plan; {f0(M.lib_clk)} kt de clínker y unas {f0(M.CO2_AHORRO)} kt de CO₂ evitados al año", "Factor clínker"],
- ["3", "Aumentar la disponibilidad del horno en 2 puntos porcentuales", "Capacidad: el horno supera el 100 % de utilización en el pico.", "Mantenimiento predictivo con sensores y analítica; programar los paros anuales en los meses de menor demanda (dic–mar).", f"{f0(esc_disp)} en el plan; {f0(M.cem_extra_anual)} kt/año de capacidad", "Utilización y disponibilidad del horno"],
+ ["3", "Aumentar la disponibilidad del horno en 2 puntos porcentuales", "Capacidad: el horno supera el 100 % de utilización en el pico.", "Mantenimiento predictivo con sensores y analítica; programar los paros anuales en los meses de menor demanda (dic–feb).", f"{f0(esc_disp)} en el plan; {f0(M.cem_extra_anual)} kt/año de capacidad", "Utilización y disponibilidad del horno"],
 ]
 table(["N.º", "Recomendación", "Hallazgo", "Acción", "Impacto estimado (MM COP)", "Indicador"], rec, [0.8, 3.2, 3.6, 4.2, 3.2, 2.2], size=8, caption="Tabla 10. Recomendaciones priorizadas.")
 para("**Industria 4.0/5.0 y sostenibilidad.** Las recomendaciones 2 y 3 son las que conectan con el enfoque del curso. El mantenimiento predictivo del horno (sensores de vibración, temperatura y consumo energético, con analítica de datos) es una aplicación directa de la Industria 4.0: reemplaza paros no programados por intervenciones planeadas, lo que mueve la disponibilidad hacia la meta. La reducción del factor clínker es la palanca ESG con efecto operativo: cada tonelada de clínker evitada reduce el consumo de combustible y las emisiones de proceso, y libera tiempo de horno, que es la etapa más cargada. El enfoque 5.0 se refleja en que las decisiones se apoyan en el criterio del equipo de planeación (por ejemplo, el ajuste del plan cuando cambia el pronóstico) con datos del tablero, y no se delegan a un algoritmo opaco.", align="j")
 para("**Criterio de priorización.** La recomendación 1 es la de mayor valor y la más inmediata (es una decisión de programación, sin inversión). La 2 combina ahorro y beneficio ESG, pero requiere validar normas y aceptación del mercado. La 3 requiere inversión en sensores, cuyo retorno debe evaluarse.", align="j")
 imp = [
- ["Diciembre de 2026", "Aprobar el plan mixto y fijar la producción de dic–mar (404,0 kt/mes)", "Planeación de operaciones", "Cumplimiento MPS"],
- ["Dic. 2026 – mar. 2027", "Programar el paro anual del horno en el mes de menor demanda; iniciar piloto de mantenimiento predictivo", "Mantenimiento", "Disponibilidad del horno"],
- ["Abril de 2027", "Subir producción a 488,0 kt/mes para acumular inventario previo al pico", "Planeación y comercial", "Fill rate; utilización del horno"],
- ["Abril – septiembre 2027", "Pruebas de adiciones para llevar el factor clínker de 0,75 a 0,72", "Calidad y producción", "Factor clínker"],
+ ["Diciembre de 2026", f"Aprobar el plan mixto y fijar la producción de {lbl(0)} a {lbl(k1-1)} ({f1(P[0])} kt/mes)", "Planeación de operaciones", "Cumplimiento MPS"],
+ ["Dic. 2026 – feb. 2027", "Programar el paro anual del horno en el mes de menor demanda; iniciar piloto de mantenimiento predictivo", "Mantenimiento", "Disponibilidad del horno"],
+ [f"{lbl(k1)}", f"Subir producción a {f1(P[k1])} kt/mes para acumular inventario previo al pico", "Planeación y comercial", "Fill rate; utilización del horno"],
+ ["Mayo – septiembre 2027", "Pruebas de adiciones para llevar el factor clínker de 0,75 a 0,72", "Calidad y producción", "Factor clínker"],
  ["Octubre – noviembre 2027", "Operar el pico con el inventario acumulado; medir el resultado frente al modelo", "Planeación", "Todos los indicadores"],
 ]
 table(["Cuándo", "Acción", "Responsable (rol)", "Indicador"], imp, [3.2, 7.2, 3.2, 3.2], size=8.5, caption="Tabla 11. Hoja de ruta de implementación (horizonte dic-26 a nov-27).")
@@ -318,12 +329,12 @@ rk = [
  ["Los supuestos de capacidad y costos difieren de la realidad", "Cambia el ranking de estrategias o la etapa más cargada", "Reemplazar los supuestos del Excel por datos internos y recalcular"],
 ]
 table(["Riesgo", "Consecuencia", "Respuesta"], rk, [5.5, 4.5, 7], size=8.5, caption="Tabla 12. Riesgos principales y respuesta.")
-para("**Limitaciones.** (i) La serie mensual histórica está reconstruida y debe sustituirse por la oficial del DANE; (ii) las capacidades, precios y costos son supuestos; (iii) la participación de mercado se asume constante; (iv) no se evaluó el costo de implementar las recomendaciones; (v) los datos del tablero son simulados.", align="j")
+para("**Limitaciones.** (i) Las cifras de 2026 del DANE son provisionales y la serie es corta (33 meses); (ii) las capacidades, precios y costos son supuestos; (iii) la participación de mercado se asume constante; (iv) no se evaluó el costo de implementar las recomendaciones; (v) los datos del tablero son simulados.", align="j")
 
 # =============================================================== 10 CONCLUSIONES
 h1(TOC[8])
 bullets([
- f"La demanda de Argos Colombia crecería cerca de 5 % anual y suma {f0(DEMs)} kt en el horizonte; Holt-Winters fue el método más preciso (MAPE {pc(M.MEJOR[2]/100)} en la ventana de evaluación), con la salvedad de que la serie es corta y reconstruida.",
+ f"La demanda de Argos Colombia crecería cerca de 5 % anual y suma {f0(DEMs)} kt en el horizonte; Holt-Winters fue el método más preciso (MAPE {pc(M.MEJOR[2]/100)} en la ventana de evaluación), con la salvedad de que la serie es corta (33 meses) y el error es in-sample.",
  f"El horno de clínker es la etapa más cargada ({pc(M.UTIL_AVG['Horno (clínker)'])} de utilización media) y la única que supera el 100 % en los meses pico; en los meses de baja demanda el límite es el mercado.",
  f"Una estrategia mixta de dos niveles de producción minimiza el costo ({mm(Cc['total'])} millones de COP), cumple el 100 % de la demanda y evita comprar clínker; el ahorro frente a las alternativas es de {f0(ahorro_BC)} a {f0(ahorro_AC)} millones de COP.",
  "El MPS de la referencia UG en saco es coherente con el plan agregado y el ATP muestra cuánta capacidad queda para nuevos pedidos en cada campaña.",
@@ -334,7 +345,7 @@ bullets([
 # =============================================================== ANEXO A
 h1(TOC[9], newpage=True)
 sup = [
- ["Despachos nacionales 2024 / 2025", "12.109,6 / 12.708,0 kt", "Dato DANE", "Sí"], ["Acumulado ene–jul 2026; jun; sep", "7.555,2; 1.061,6; 1.194,4 kt", "Dato DANE", "Sí"],
+ ["Despachos nacionales 2024 / 2025", f"{f1(S['nac_2024'])} / {f1(S['nac_2025'])} kt", "Dato DANE (Anexo A1)", "No"], ["Acumulado ene–jul 2026; jun; sep", f"{f1(ej26)}; 1.061,6; 1.194,4 kt", "Dato DANE (provisional)", "No"],
  ["Cemento Argos Colombia 2025", "5.000 kt", "Grupo Argos (2026)", "Sí"], ["Participación de mercado", pc(S["share"]), "Calculada", "Sí"],
  ["Capacidad de diseño del horno", "5.000 kt clínker/año", "Supuesto", "Sí"], ["Disponibilidad del horno", "88 %", "Supuesto (rango 85–90 %)", "Sí"],
  ["Factor clínker", "0,75 t/t (0,746 ponderado)", "Supuesto", "Sí"], ["Capacidad de molienda / eficiencia", "6.800 kt/año / 90 %", "Supuesto", "Sí"],
@@ -342,7 +353,7 @@ sup = [
  ["Costo de mantener inventario", "22 % anual sobre 400.000 COP/t", "Supuesto (rango 20–25 %)", "No"], ["Sobrecosto sobre capacidad regular", "60.000 COP/t", "Supuesto", "Declarar"],
  ["Costo de cambiar el ritmo", "20.000 COP/t de cambio", "Supuesto", "Declarar"], ["Capacidad extra / inventario inicial", "+8 % / 150 kt", "Supuesto", "Declarar"],
  ["Vida útil del cemento en saco", "1,5 meses de demanda", "Supuesto", "Sí"], ["t CO₂ por t de clínker", "0,85", "Referencia sectorial", "Sí"],
- ["Serie mensual histórica", "Reconstruida (calibrada con totales DANE)", "Supuesto", "Reemplazar por ECG oficial"],
+ ["Serie mensual histórica (ene-24 a sep-26)", "33 meses de la ECG del DANE", "Dato DANE (Anexo A1, sep-2026)", "No"],
  ["Pedidos firmes del MPS y datos del tablero", "Simulados", "Simulación", "—"],
 ]
 table(["Supuesto o dato", "Valor", "Tipo / fuente", "Verificar"], sup, [5.8, 4.8, 4.2, 2.6], size=8.5, caption="Tabla A1. Supuestos consolidados (la columna 'Verificar' indica qué debe contrastarse con fuentes antes de la entrega).")
@@ -351,7 +362,7 @@ table(["Supuesto o dato", "Valor", "Tipo / fuente", "Verificar"], sup, [5.8, 4.8
 h1(TOC[10], newpage=True)
 refs = [
  "Argos. (2025). *Reporte integrado Cementos Argos 2024*. https://files.grupoargos.com/uploads-grupo-argos/2025/03/Reporte-Integrado-cementos-argos-2024.pdf",
- "Departamento Administrativo Nacional de Estadística. (2026). *Estadísticas de cemento gris (ECG): boletines técnicos de diciembre de 2025, julio de 2026 y septiembre de 2026*. https://www.dane.gov.co/index.php/en/statistics-by-topic-1/construction/estadisticas-de-cemento-gris",
+ "Departamento Administrativo Nacional de Estadística. (2026). *Estadísticas de cemento gris (ECG): anexos del boletín técnico de septiembre de 2026* [Conjunto de datos]. https://www.dane.gov.co/index.php/en/statistics-by-topic-1/construction/estadisticas-de-cemento-gris",
  "Grupo Argos. (2026). *Informe de gestión Grupo Argos 2025*. https://files.grupoargos.com/uploads-grupo-argos/2026/03/InformeGestion_GrupoArgos_2025.pdf",
  "Heizer, J., Render, B., & Munson, C. (2020). *Operations management: Sustainability and supply chain management* (13.ª ed.). Pearson.",
  "Hyndman, R. J., & Athanasopoulos, G. (2021). *Forecasting: Principles and practice* (3.ª ed.). OTexts. https://otexts.com/fpp3/",

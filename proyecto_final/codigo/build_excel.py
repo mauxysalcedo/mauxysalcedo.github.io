@@ -36,7 +36,7 @@ lines = [
  "Este libro contiene todos los cálculos del proyecto. Flujo: Supuestos → Historico → Pronostico → Capacidad → Agregado → MPS → Tablero.",
  "Convención de color: AZUL = dato de entrada o supuesto (editable). NEGRO = fórmula. Cambie un supuesto en la hoja 'Supuestos' y todo se recalcula.",
  "Unidades: miles de toneladas (kt) de cemento por mes, salvo que se indique otra cosa. Dinero en pesos colombianos (COP).",
- "IMPORTANTE: la serie mensual histórica es RECONSTRUIDA (calibrada con totales anuales y puntos mensuales públicos del DANE) porque no fue posible descargar la serie mensual oficial. Reemplace la columna azul de 'Historico' con la serie oficial ECG del DANE y el modelo se actualiza.",
+ "Fuente de la demanda histórica: serie oficial de despachos nacionales de cemento gris del DANE (Estadísticas de Cemento Gris, Anexo A1, boletín de septiembre de 2026; las cifras recientes son provisionales). La hoja 'Historico' contiene esa serie (celdas azules).",
  "Los datos de la hoja 'Tablero' (valores 'reales') son SIMULADOS para demostrar el funcionamiento del tablero.",
  "Verificar antes de entregar: ver columna 'Verificar' en la hoja Supuestos.",
 ]
@@ -48,8 +48,8 @@ ws.column_dimensions["A"].width = 130
 sp = wb.create_sheet("Supuestos"); title(sp, "Supuestos y datos de entrada", "Todas las demás hojas leen de aquí. Azul = editable.")
 hdr(sp, 3, ["Parámetro", "Símbolo", "Valor", "Unidad", "Tipo", "Fuente / justificación", "Verificar"])
 rows = [
- ("Despachos nacionales de cemento gris 2024", "nac24", S["nac_2024"], "kt", "Dato público", "DANE, Estadísticas de Cemento Gris (ECG), 2024", "Sí"),
- ("Despachos nacionales de cemento gris 2025", "nac25", S["nac_2025"], "kt", "Dato público", "DANE, ECG, 2025 (provisional)", "Sí"),
+ ("Despachos nacionales de cemento gris 2024", "nac24", S["nac_2024"], "kt", "Dato público", "DANE, Estadísticas de Cemento Gris (ECG), Anexo A1, boletín sep-2026", "No"),
+ ("Despachos nacionales de cemento gris 2025", "nac25", S["nac_2025"], "kt", "Dato público", "DANE, ECG, Anexo A1, boletín sep-2026 (provisional)", "No"),
  ("Cemento Argos regional Colombia 2025", "arg25", S["argos_col_2025"], "kt", "Dato público", "Informe de Gestión Grupo Argos 2025 (5,0 Mt). Otra fuente reporta 5,4 Mt: alcances distintos", "Sí"),
  ("Participación de mercado de Argos (calculada)", "share", "=C6/C5", "%", "Calculado", "Argos Colombia / despachos nacionales 2025", "Sí"),
  ("Capacidad de diseño del horno (clínker)", "clk_dis", S["clinker_design"], "kt/año", "SUPUESTO", "Red Colombia; la capacidad total de Argos (14,4 Mt cemento) incluye otras regionales. Valor propio del equipo", "Sí"),
@@ -92,19 +92,17 @@ widths(sp, [48, 11, 14, 15, 13, 95, 10])
 sp.freeze_panes = "A4"
 
 # ------------------------------------------------------------ HISTÓRICO
-hs = wb.create_sheet("Historico"); title(hs, "Demanda histórica (kt/mes)", "Serie nacional reconstruida y calibrada con datos públicos del DANE (reemplazar por serie ECG oficial). Argos = nacional x participación.")
+hs = wb.create_sheet("Historico"); title(hs, "Demanda histórica (kt/mes)", "Serie oficial del DANE (ECG, Anexo A1, boletín sep-2026, cifras provisionales). Demanda Argos = despachos nacionales x participación de mercado.")
 hdr(hs, 3, ["Mes", "Despachos nacionales (kt)", "Demanda Argos Colombia (kt)", "Observación"])
 obs = {}
 for i, d in enumerate(M.H_LABEL):
-    if d.year == 2026 and d.month == 6: obs[i] = "Dato DANE (1.061,6)"
-    if d.year == 2026 and d.month == 9: obs[i] = "Dato DANE (1.194,4, provisional)"
-    if d.year == 2026 and d.month == 8: obs[i] = "Supuesto (no recuperado)"
+    obs[i] = "DANE ECG (provisional)" if d.year == 2026 else "DANE ECG"
 for i, d in enumerate(M.H_LABEL):
     r = 4 + i
     hs.cell(row=r, column=1, value=d).number_format = "mmm-yy"
     c = hs.cell(row=r, column=2, value=round(float(M.HIST_NAC[i]), 2)); c.font = INP
     hs.cell(row=r, column=3, value=f"=B{r}*{R['share']}").number_format = "0.0"
-    hs.cell(row=r, column=4, value=obs.get(i, "Reconstruido"))
+    hs.cell(row=r, column=4, value=obs[i])
 HN = 4 + len(M.H_LABEL) - 1       # última fila histórico
 hs.cell(row=HN + 2, column=1, value="Control 2024 (debe = DANE)"); hs.cell(row=HN + 2, column=2, value="=SUM(B4:B15)")
 hs.cell(row=HN + 3, column=1, value="Control 2025 (debe = DANE)"); hs.cell(row=HN + 3, column=2, value="=SUM(B16:B27)")
